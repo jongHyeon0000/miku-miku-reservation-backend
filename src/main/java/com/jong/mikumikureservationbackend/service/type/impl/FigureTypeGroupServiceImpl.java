@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.type.FigureTypeMapper;
 import com.jong.mikumikureservationbackend.service.type.FigureTypeGroupService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.type.FigureTypeGroupVO;
 import com.jong.mikumikureservationbackend.vo.type.FigureTypeVO;
 import lombok.RequiredArgsConstructor;
@@ -101,9 +101,9 @@ public class FigureTypeGroupServiceImpl implements FigureTypeGroupService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long figureTypeGroupId) {
+    public UsageResponseVO getUsage(Long userId, Long figureTypeGroupId) {
         find(userId, figureTypeGroupId);
-        return new UsageResponse(figureTypeGroupMapper.countUsage(userId, figureTypeGroupId));
+        return new UsageResponseVO(figureTypeGroupMapper.countUsage(userId, figureTypeGroupId));
     }
 
     private FigureTypeGroupVO find(Long userId, Long figureTypeGroupId) {

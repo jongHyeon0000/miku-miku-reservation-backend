@@ -7,7 +7,7 @@ import com.jong.mikumikureservationbackend.common.exception.BusinessException;
 import com.jong.mikumikureservationbackend.mapper.maker.MakerMapper;
 import com.jong.mikumikureservationbackend.service.maker.MakerService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -78,9 +78,9 @@ public class MakerServiceImpl implements MakerService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long makerId) {
+    public UsageResponseVO getUsage(Long userId, Long makerId) {
         find(userId, makerId);
-        return new UsageResponse(makerMapper.countUsage(userId, makerId));
+        return new UsageResponseVO(makerMapper.countUsage(userId, makerId));
     }
 
     private MakerVO find(Long userId, Long makerId) {

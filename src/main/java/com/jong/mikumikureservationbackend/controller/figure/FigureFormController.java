@@ -3,7 +3,7 @@ package com.jong.mikumikureservationbackend.controller.figure;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.figure.FigureFormService;
-import com.jong.mikumikureservationbackend.vo.figure.FigureFormOptionsResponse;
+import com.jong.mikumikureservationbackend.vo.figure.response.FigureFormOptionsResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class FigureFormController {
                     + "| `genres` | 장르 > 캐릭터 |\n"
                     + "| `makers` | 제조사 (상하위 없이 평면) |")
     @GetMapping
-    public ApiResponse<FigureFormOptionsResponse> getOptions() {
+    public ApiResponse<FigureFormOptionsResponseVO> getOptions() {
         return ApiResponse.ok("조회가 완료되었습니다.", figureFormService.getOptions(currentUser.getId()));
     }
 }

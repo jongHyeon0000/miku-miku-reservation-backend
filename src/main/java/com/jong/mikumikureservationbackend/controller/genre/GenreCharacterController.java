@@ -3,7 +3,7 @@ package com.jong.mikumikureservationbackend.controller.genre;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.genre.GenreCharacterService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -103,7 +103,7 @@ public class GenreCharacterController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "대상 없음")
     })
     @GetMapping("/{genreCharacterId}/usage")
-    public ApiResponse<UsageResponse> getUsage(
+    public ApiResponse<UsageResponseVO> getUsage(
             @Parameter(description = "조회할 캐릭터 id", example = "1") @PathVariable Long genreCharacterId) {
         return ApiResponse.ok("조회가 완료되었습니다.", genreCharacterService.getUsage(currentUser.getId(), genreCharacterId));
     }

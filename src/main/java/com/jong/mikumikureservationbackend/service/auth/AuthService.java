@@ -1,8 +1,8 @@
 package com.jong.mikumikureservationbackend.service.auth;
 
-import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
-import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
-import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
+import com.jong.mikumikureservationbackend.vo.user.response.FindIdResponseVO;
+import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.response.LoginResponseVO;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
 
 public interface AuthService {
@@ -17,7 +17,7 @@ public interface AuthService {
     void sendFindIdEmailCode(String email);
 
     /* 이메일 인증을 마친 이메일의 계정 아이디를 돌려준다. 인증 완료는 1회용으로 소모된다 */
-    FindIdResponse findId(String email);
+    FindIdResponseVO findId(String email);
 
     /* 비밀번호 재설정용 인증 코드를 메일로 보낸다. 아이디와 이메일이 같은 계정일 때만 보낸다 */
     void sendResetPasswordEmailCode(String loginId, String email);
@@ -28,7 +28,7 @@ public interface AuthService {
     /* 로그인한 사용자의 비밀번호를 바꾼다. 현재 비밀번호가 맞아야 한다 */
     void changePassword(Long userId, String currentPassword, String newPassword);
 
-    LoginResponse login(LoginRequestVO request);
+    LoginResponseVO login(LoginRequestVO request);
 
     UserVO getMe(Long userId);
 

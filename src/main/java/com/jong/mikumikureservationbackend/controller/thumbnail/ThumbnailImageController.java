@@ -4,7 +4,7 @@ import com.jong.mikumikureservationbackend.common.constant.ThumbnailTarget;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.thumbnail.ThumbnailUrlResponse;
+import com.jong.mikumikureservationbackend.vo.thumbnail.ThumbnailUrlResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -37,7 +37,7 @@ public class ThumbnailImageController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "대상 없음")
     })
     @PutMapping(value = "/{targetType}/{targetId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ThumbnailUrlResponse> upload(
+    public ApiResponse<ThumbnailUrlResponseVO> upload(
             @Parameter(description = "썸네일을 붙일 대상 종류 (경로): figure, shop-group, shop, figure-type-group, figure-type, series-group, series, genre-character-group, genre-character, maker, user(내 프로필, targetId는 내 계정 id)", example = "figure") @PathVariable String targetType,
             @Parameter(description = "대상 id", example = "1") @PathVariable Long targetId,
             @Parameter(description = "업로드할 이미지 파일 (본문 multipart, 필드명 file, 필수, jpg/jpeg/png/gif/webp, 최대 5MB)") @RequestParam("file") MultipartFile file) {

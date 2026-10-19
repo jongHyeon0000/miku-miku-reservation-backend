@@ -1,5 +1,6 @@
-package com.jong.mikumikureservationbackend.vo.figure;
+package com.jong.mikumikureservationbackend.vo.figure.response;
 
+import com.jong.mikumikureservationbackend.vo.figure.FigureVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesVO;

@@ -3,7 +3,7 @@ package com.jong.mikumikureservationbackend.controller.type;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.type.FigureTypeGroupService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.type.FigureTypeGroupVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -102,7 +102,7 @@ public class FigureTypeGroupController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "대상 없음")
     })
     @GetMapping("/{figureTypeGroupId}/usage")
-    public ApiResponse<UsageResponse> getUsage(
+    public ApiResponse<UsageResponseVO> getUsage(
             @Parameter(description = "조회할 형태 id", example = "1") @PathVariable Long figureTypeGroupId) {
         return ApiResponse.ok("조회가 완료되었습니다.", figureTypeGroupService.getUsage(currentUser.getId(), figureTypeGroupId));
     }

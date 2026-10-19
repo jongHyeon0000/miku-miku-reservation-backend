@@ -2,7 +2,7 @@ package com.jong.mikumikureservationbackend.controller.editor;
 
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.service.editor.EditorImageCleanupService;
-import com.jong.mikumikureservationbackend.vo.editor.EditorImageCleanupResponse;
+import com.jong.mikumikureservationbackend.vo.editor.EditorImageCleanupResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class EditorImageCleanupController {
             summary = "고아 에디터 이미지 정리 수동 실행 (예: 어떤 상품에도 안 쓰이는 이미지 지우기)",
             description = "응답: scannedCount: 정리 대상 수, deletedCount: 삭제 수, failedCount: 실패 수")
     @PostMapping
-    public ApiResponse<EditorImageCleanupResponse> cleanup() {
+    public ApiResponse<EditorImageCleanupResponseVO> cleanup() {
         return ApiResponse.ok("정리가 완료되었습니다.", editorImageCleanupService.cleanup());
     }
 }

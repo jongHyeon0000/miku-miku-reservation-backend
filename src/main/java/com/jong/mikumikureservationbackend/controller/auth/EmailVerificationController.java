@@ -2,7 +2,7 @@ package com.jong.mikumikureservationbackend.controller.auth;
 
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.service.auth.EmailVerificationService;
-import com.jong.mikumikureservationbackend.vo.user.EmailVerificationVO;
+import com.jong.mikumikureservationbackend.vo.user.request.EmailVerificationVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

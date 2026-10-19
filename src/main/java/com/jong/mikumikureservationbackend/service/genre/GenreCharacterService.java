@@ -1,6 +1,6 @@
 package com.jong.mikumikureservationbackend.service.genre;
 
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public interface GenreCharacterService {
     /* 쓰던 상품을 기본 항목(기타 > 기타)으로 옮긴 뒤 삭제한다 */
     void delete(Long userId, Long genreCharacterId);
 
-    UsageResponse getUsage(Long userId, Long genreCharacterId);
+    UsageResponseVO getUsage(Long userId, Long genreCharacterId);
 }

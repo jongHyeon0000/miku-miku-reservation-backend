@@ -1,4 +1,4 @@
-package com.jong.mikumikureservationbackend.vo.figure;
+package com.jong.mikumikureservationbackend.vo.figure.request;
 
 import com.jong.mikumikureservationbackend.common.constant.FigureStatus;
 import com.jong.mikumikureservationbackend.common.constant.PaymentType;

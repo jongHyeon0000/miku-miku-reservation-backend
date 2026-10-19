@@ -4,7 +4,7 @@ import com.jong.mikumikureservationbackend.common.constant.UploadConstant;
 import com.jong.mikumikureservationbackend.mapper.editor.EditorImageMapper;
 import com.jong.mikumikureservationbackend.service.common.ImageFileStore;
 import com.jong.mikumikureservationbackend.service.editor.EditorImageCleanupService;
-import com.jong.mikumikureservationbackend.vo.editor.EditorImageCleanupResponse;
+import com.jong.mikumikureservationbackend.vo.editor.EditorImageCleanupResponseVO;
 import com.jong.mikumikureservationbackend.vo.editor.EditorImageVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class EditorImageCleanupServiceImpl implements EditorImageCleanupService 
     private final ImageFileStore imageFileStore;
 
     @Override
-    public EditorImageCleanupResponse cleanup() {
+    public EditorImageCleanupResponseVO cleanup() {
         List<EditorImageVO> orphans = editorImageMapper.selectOrphans(UploadConstant.ORPHAN_RETENTION_DAYS);
         int deleted = 0;
         int failed = 0;
@@ -34,7 +34,7 @@ public class EditorImageCleanupServiceImpl implements EditorImageCleanupService 
             }
         }
         log.info("에디터 이미지 정리: 대상 {}건, 삭제 {}건, 실패 {}건", orphans.size(), deleted, failed);
-        return new EditorImageCleanupResponse(orphans.size(), deleted, failed);
+        return new EditorImageCleanupResponseVO(orphans.size(), deleted, failed);
     }
 
     /* 파일을 먼저 지우고 성공하면 행을 지운다. 파일 삭제에 실패하면 행을 남겨 다음 정리에서 다시 시도한다 */

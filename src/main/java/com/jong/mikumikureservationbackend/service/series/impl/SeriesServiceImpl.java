@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.series.SeriesGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.series.SeriesMapper;
 import com.jong.mikumikureservationbackend.service.series.SeriesService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -91,9 +91,9 @@ public class SeriesServiceImpl implements SeriesService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long seriesId) {
+    public UsageResponseVO getUsage(Long userId, Long seriesId) {
         find(userId, seriesId);
-        return new UsageResponse(seriesMapper.countUsage(userId, seriesId));
+        return new UsageResponseVO(seriesMapper.countUsage(userId, seriesId));
     }
 
     private SeriesVO find(Long userId, Long seriesId) {

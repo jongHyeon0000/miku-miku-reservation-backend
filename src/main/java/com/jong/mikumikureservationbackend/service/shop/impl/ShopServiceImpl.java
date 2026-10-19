@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.shop.ShopGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.shop.ShopMapper;
 import com.jong.mikumikureservationbackend.service.shop.ShopService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.shop.ShopVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -90,9 +90,9 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long shopId) {
+    public UsageResponseVO getUsage(Long userId, Long shopId) {
         find(userId, shopId);
-        return new UsageResponse(shopMapper.countUsage(userId, shopId));
+        return new UsageResponseVO(shopMapper.countUsage(userId, shopId));
     }
 
     private ShopVO find(Long userId, Long shopId) {

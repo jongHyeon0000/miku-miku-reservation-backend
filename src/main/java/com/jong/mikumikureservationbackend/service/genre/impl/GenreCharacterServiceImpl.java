@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterGroupMappe
 import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.mikumikureservationbackend.service.genre.GenreCharacterService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -91,9 +91,9 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long genreCharacterId) {
+    public UsageResponseVO getUsage(Long userId, Long genreCharacterId) {
         find(userId, genreCharacterId);
-        return new UsageResponse(genreCharacterMapper.countUsage(userId, genreCharacterId));
+        return new UsageResponseVO(genreCharacterMapper.countUsage(userId, genreCharacterId));
     }
 
     private GenreCharacterVO find(Long userId, Long genreCharacterId) {

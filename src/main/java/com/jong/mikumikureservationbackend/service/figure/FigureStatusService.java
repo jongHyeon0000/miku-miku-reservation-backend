@@ -1,7 +1,7 @@
 package com.jong.mikumikureservationbackend.service.figure;
 
-import com.jong.mikumikureservationbackend.vo.figure.FigureResponseVO;
-import com.jong.mikumikureservationbackend.vo.figure.FigureStatusRequestVO;
+import com.jong.mikumikureservationbackend.vo.figure.response.FigureResponseVO;
+import com.jong.mikumikureservationbackend.vo.figure.request.FigureStatusRequestVO;
 
 import java.util.List;
 

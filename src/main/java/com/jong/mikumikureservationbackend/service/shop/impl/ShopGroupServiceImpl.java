@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.shop.ShopGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.shop.ShopMapper;
 import com.jong.mikumikureservationbackend.service.shop.ShopGroupService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.shop.ShopGroupVO;
 import com.jong.mikumikureservationbackend.vo.shop.ShopVO;
 import lombok.RequiredArgsConstructor;
@@ -101,9 +101,9 @@ public class ShopGroupServiceImpl implements ShopGroupService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long shopGroupId) {
+    public UsageResponseVO getUsage(Long userId, Long shopGroupId) {
         find(userId, shopGroupId);
-        return new UsageResponse(shopGroupMapper.countUsage(userId, shopGroupId));
+        return new UsageResponseVO(shopGroupMapper.countUsage(userId, shopGroupId));
     }
 
     private ShopGroupVO find(Long userId, Long shopGroupId) {

@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.type.FigureTypeMapper;
 import com.jong.mikumikureservationbackend.service.type.FigureTypeService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.type.FigureTypeVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -90,9 +90,9 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long figureTypeId) {
+    public UsageResponseVO getUsage(Long userId, Long figureTypeId) {
         find(userId, figureTypeId);
-        return new UsageResponse(figureTypeMapper.countUsage(userId, figureTypeId));
+        return new UsageResponseVO(figureTypeMapper.countUsage(userId, figureTypeId));
     }
 
     private FigureTypeVO find(Long userId, Long figureTypeId) {

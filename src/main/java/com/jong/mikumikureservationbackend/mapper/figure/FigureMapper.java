@@ -1,8 +1,8 @@
 package com.jong.mikumikureservationbackend.mapper.figure;
 
 import com.jong.mikumikureservationbackend.common.constant.FigureStatus;
-import com.jong.mikumikureservationbackend.vo.figure.FigureResponseVO;
-import com.jong.mikumikureservationbackend.vo.figure.FigureSaveRequestVO;
+import com.jong.mikumikureservationbackend.vo.figure.response.FigureResponseVO;
+import com.jong.mikumikureservationbackend.vo.figure.request.FigureSaveRequestVO;
 import com.jong.mikumikureservationbackend.vo.figure.FigureVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

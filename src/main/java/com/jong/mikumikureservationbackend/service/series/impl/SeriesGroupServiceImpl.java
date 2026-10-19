@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.series.SeriesGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.series.SeriesMapper;
 import com.jong.mikumikureservationbackend.service.series.SeriesGroupService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesGroupVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesVO;
 import lombok.RequiredArgsConstructor;
@@ -102,9 +102,9 @@ public class SeriesGroupServiceImpl implements SeriesGroupService {
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long seriesGroupId) {
+    public UsageResponseVO getUsage(Long userId, Long seriesGroupId) {
         find(userId, seriesGroupId);
-        return new UsageResponse(seriesGroupMapper.countUsage(userId, seriesGroupId));
+        return new UsageResponseVO(seriesGroupMapper.countUsage(userId, seriesGroupId));
     }
 
     private SeriesGroupVO find(Long userId, Long seriesGroupId) {

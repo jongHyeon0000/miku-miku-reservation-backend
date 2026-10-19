@@ -20,9 +20,9 @@ import com.jong.mikumikureservationbackend.mapper.user.UserMapper;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
 import com.jong.mikumikureservationbackend.service.auth.EmailVerificationService;
 import com.jong.mikumikureservationbackend.service.common.ImageFileStore;
-import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
-import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
-import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
+import com.jong.mikumikureservationbackend.vo.user.response.FindIdResponseVO;
+import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.response.LoginResponseVO;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -109,14 +109,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public FindIdResponse findId(String email) {
+    public FindIdResponseVO findId(String email) {
         String normalized = email.trim().toLowerCase(Locale.ROOT);
         emailVerificationService.consume(normalized, EmailVerificationPurpose.FIND_ID);
         UserVO user = userMapper.selectByEmail(normalized);
         if (user == null) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "가입된 이메일이 아닙니다");
         }
-        return new FindIdResponse(user.getLoginId());
+        return new FindIdResponseVO(user.getLoginId());
     }
 
     @Override
@@ -153,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequestVO request) {
+    public LoginResponseVO login(LoginRequestVO request) {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -162,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(GlobalExceptionCode.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다");
         }
         AuthUser principal = (AuthUser) authentication.getPrincipal();
-        return new LoginResponse(jwtProvider.createToken(principal.getUserId()));
+        return new LoginResponseVO(jwtProvider.createToken(principal.getUserId()));
     }
 
     @Override

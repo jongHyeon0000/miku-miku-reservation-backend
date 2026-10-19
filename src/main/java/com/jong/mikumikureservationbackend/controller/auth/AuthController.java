@@ -3,14 +3,14 @@ package com.jong.mikumikureservationbackend.controller.auth;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
-import com.jong.mikumikureservationbackend.vo.user.ChangePasswordRequestVO;
-import com.jong.mikumikureservationbackend.vo.user.EmailVerificationVO;
-import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
-import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
-import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
-import com.jong.mikumikureservationbackend.vo.user.ResetPasswordRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.request.ChangePasswordRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.request.EmailVerificationVO;
+import com.jong.mikumikureservationbackend.vo.user.response.FindIdResponseVO;
+import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.response.LoginResponseVO;
+import com.jong.mikumikureservationbackend.vo.user.request.ResetPasswordRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
-import com.jong.mikumikureservationbackend.vo.user.WithdrawRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.request.WithdrawRequestVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -111,7 +111,7 @@ public class AuthController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 이메일 인증 미완료, 가입되지 않은 이메일")
     })
     @PostMapping("/find-id")
-    public ApiResponse<FindIdResponse> findId(@Valid @RequestBody EmailVerificationVO request) {
+    public ApiResponse<FindIdResponseVO> findId(@Valid @RequestBody EmailVerificationVO request) {
         return ApiResponse.ok("조회가 완료되었습니다.", authService.findId(request.getEmail()));
     }
 
@@ -173,7 +173,7 @@ public class AuthController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "아이디 또는 비밀번호 불일치 (둘을 구분하지 않음)")
     })
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequestVO request) {
+    public ApiResponse<LoginResponseVO> login(@Valid @RequestBody LoginRequestVO request) {
         return ApiResponse.ok("로그인되었습니다.", authService.login(request));
     }
 

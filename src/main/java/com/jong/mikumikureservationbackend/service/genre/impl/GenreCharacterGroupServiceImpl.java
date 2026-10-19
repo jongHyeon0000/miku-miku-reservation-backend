@@ -8,7 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterGroupMappe
 import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.mikumikureservationbackend.service.genre.GenreCharacterGroupService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
-import com.jong.mikumikureservationbackend.vo.common.UsageResponse;
+import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterGroupVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 import lombok.RequiredArgsConstructor;
@@ -102,9 +102,9 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     }
 
     @Override
-    public UsageResponse getUsage(Long userId, Long genreCharacterGroupId) {
+    public UsageResponseVO getUsage(Long userId, Long genreCharacterGroupId) {
         find(userId, genreCharacterGroupId);
-        return new UsageResponse(genreCharacterGroupMapper.countUsage(userId, genreCharacterGroupId));
+        return new UsageResponseVO(genreCharacterGroupMapper.countUsage(userId, genreCharacterGroupId));
     }
 
     private GenreCharacterGroupVO find(Long userId, Long genreCharacterGroupId) {

@@ -19,7 +19,7 @@ import com.jong.mikumikureservationbackend.mapper.user.UserMapper;
 import com.jong.mikumikureservationbackend.service.common.ImageFileStore;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
 import com.jong.mikumikureservationbackend.vo.thumbnail.ThumbnailImageVO;
-import com.jong.mikumikureservationbackend.vo.thumbnail.ThumbnailUrlResponse;
+import com.jong.mikumikureservationbackend.vo.thumbnail.ThumbnailUrlResponseVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +52,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
 
     @Override
     @Transactional
-    public ThumbnailUrlResponse upload(Long userId, ThumbnailTarget target, Long targetId, MultipartFile file) {
+    public ThumbnailUrlResponseVO upload(Long userId, ThumbnailTarget target, Long targetId, MultipartFile file) {
         checkTargetExists(userId, target, targetId);
         imageFileStore.validate(file);
         String originalName = imageFileStore.originalNameOf(file);
@@ -70,7 +70,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
         if (old != null) {
             imageFileStore.delete(old.getFilePath());
         }
-        return new ThumbnailUrlResponse(UploadConstant.URL_PREFIX + filePath);
+        return new ThumbnailUrlResponseVO(UploadConstant.URL_PREFIX + filePath);
     }
 
     @Override
