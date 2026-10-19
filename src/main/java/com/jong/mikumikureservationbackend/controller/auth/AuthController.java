@@ -7,6 +7,7 @@ import com.jong.mikumikureservationbackend.vo.user.EmailVerificationVO;
 import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
 import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
+import com.jong.mikumikureservationbackend.vo.user.ResetPasswordRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
 import com.jong.mikumikureservationbackend.vo.user.WithdrawRequestVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -110,6 +111,48 @@ public class AuthController {
     @PostMapping("/find-id")
     public ApiResponse<FindIdResponse> findId(@Valid @RequestBody EmailVerificationVO request) {
         return ApiResponse.ok("조회가 완료되었습니다.", authService.findId(request.getEmail()));
+    }
+
+    @Operation(
+            summary = "비밀번호 재설정용 이메일 인증 코드 발송 (예: 아이디 jong1234 의 가입 이메일로 6자리 코드 받기)",
+            description = "인증이 필요 없다(토큰 없이 호출). 재설정 순서: 이 API로 코드 받기 → POST /api/auth/email-verification/verify(purpose: RESET_PASSWORD)로 코드 확인 → POST /api/auth/reset-password로 새 비밀번호 설정\n\n"
+                    + "요청 본문: email: 이메일 (본문, 필수, 100자 이하), loginId: 로그인 아이디 (본문, 필수)\n\n"
+                    + "규칙: 아이디와 이메일이 같은 계정일 때만 발송한다. 코드는 6자리 숫자이고 10분 동안 유효하며, 같은 이메일은 60초 뒤에 다시 받을 수 있다.\n\n"
+                    + "응답: 성공 시 data 없음")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "발송 예", value = "{\"email\":\"jong@example.com\",\"loginId\":\"jong1234\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 아이디와 이메일이 같은 계정이 아님, 60초 안에 재요청"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "메일 발송 실패")
+    })
+    @PostMapping("/reset-password/email-code")
+    public ApiResponse<Void> sendResetPasswordEmailCode(@Valid @RequestBody EmailVerificationVO request) {
+        authService.sendResetPasswordEmailCode(request.getLoginId(), request.getEmail());
+        return ApiResponse.ok("인증 코드를 메일로 보냈습니다.");
+    }
+
+    @Operation(
+            summary = "비밀번호 재설정 (예: 이메일 인증을 마친 계정의 새 비밀번호 설정)",
+            description = "인증이 필요 없다(토큰 없이 호출). 먼저 이메일 인증(코드 발송과 확인, purpose: RESET_PASSWORD)을 끝내야 하고, 확인 후 30분 안에 호출해야 한다.\n\n"
+                    + "요청 본문: loginId: 로그인 아이디 (본문, 필수), email: 인증을 마친 이메일 (본문, 필수, 100자 이하), newPassword: 새 비밀번호 (본문, 필수, 8~20자)\n\n"
+                    + "규칙: 아이디와 이메일이 같은 계정이어야 한다. 인증은 한 번 쓰면 소모되고, 30분이 지나면 코드 발송부터 다시 해야 한다.\n\n"
+                    + "응답: 성공 시 data 없음")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "재설정 예",
+                    value = "{\"loginId\":\"jong1234\",\"email\":\"jong@example.com\",\"newPassword\":\"newPassword1234\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 아이디와 이메일이 같은 계정이 아님, 이메일 인증 미완료 또는 30분 경과")
+    })
+    @PostMapping("/reset-password")
+    public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordRequestVO request) {
+        authService.resetPassword(request.getLoginId(), request.getEmail(), request.getNewPassword());
+        return ApiResponse.ok("비밀번호가 변경되었습니다.");
     }
 
     @Operation(

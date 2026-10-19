@@ -31,6 +31,12 @@
         SELECT LAST_INSERT_ID()
     </select>
 
+    <update id="updatePassword">
+        UPDATE users
+        SET password_hash = #{passwordHash}
+        WHERE user_id = #{userId}
+    </update>
+
     <delete id="delete">
         DELETE FROM users
         WHERE user_id = #{userId}

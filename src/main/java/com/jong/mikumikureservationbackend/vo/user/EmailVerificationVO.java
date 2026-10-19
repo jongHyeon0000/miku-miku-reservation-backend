@@ -11,7 +11,7 @@ import lombok.Setter;
 
 /**
  * 이메일 인증 요청 (DB 테이블 없음, 인증 정보는 Redis에 저장)
- * 가입 코드 발송 요청은 email만, 코드 확인 요청은 email, purpose, code를 읽는다.
+ * 가입, 아이디 찾기 코드 발송 요청은 email만, 비밀번호 재설정 코드 발송은 email, loginId, 코드 확인 요청은 email, purpose, code를 읽는다.
  */
 @Schema(description = "이메일 인증 요청. 가입 코드 발송은 email만, 코드 확인은 email, purpose, code를 읽는다")
 @Getter
@@ -29,6 +29,10 @@ public class EmailVerificationVO {
     /** [request] 목적: SIGNUP 가입, FIND_ID 아이디 찾기, RESET_PASSWORD 비밀번호 재설정. 코드 확인에서만 필수 */
     @Schema(description = "목적: SIGNUP 가입, FIND_ID 아이디 찾기, RESET_PASSWORD 비밀번호 재설정. 코드 확인에서만 필수", example = "SIGNUP")
     private EmailVerificationPurpose purpose;
+
+    /** [request] 로그인 아이디. 비밀번호 재설정 코드 발송에서만 필수 */
+    @Schema(description = "로그인 아이디. 비밀번호 재설정 코드 발송에서만 필수", example = "jong1234")
+    private String loginId;
 
     /** [request] 이메일로 받은 6자리 인증 코드. 코드 확인에서만 필수 */
     @Schema(description = "이메일로 받은 6자리 인증 코드. 코드 확인에서만 필수", example = "123456")

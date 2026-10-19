@@ -120,6 +120,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void sendResetPasswordEmailCode(String loginId, String email) {
+        if (loginId == null || loginId.trim().isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "loginId: 아이디를 입력해 주세요");
+        }
+        String normalized = email.trim().toLowerCase(Locale.ROOT);
+        selectMatchingUser(loginId, normalized);
+        emailVerificationService.sendCode(normalized, EmailVerificationPurpose.RESET_PASSWORD);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String loginId, String email, String newPassword) {
+        String normalized = email.trim().toLowerCase(Locale.ROOT);
+        // 인증 표시는 이메일 기준이라 아이디와 이메일이 같은 계정인지 먼저 확인하고, 통과한 뒤에만 소모한다
+        UserVO user = selectMatchingUser(loginId, normalized);
+        emailVerificationService.consume(normalized, EmailVerificationPurpose.RESET_PASSWORD);
+        updatePassword(user.getUserId(), newPassword);
+    }
+
+    @Override
     public LoginResponse login(LoginRequestVO request) {
         Authentication authentication;
         try {
@@ -163,6 +183,18 @@ public class AuthServiceImpl implements AuthService {
                 imageFileStore.deleteDirectory(String.valueOf(userId));
             }
         });
+    }
+
+    private UserVO selectMatchingUser(String loginId, String normalizedEmail) {
+        UserVO user = userMapper.selectByLoginId(loginId.trim());
+        if (user == null || !normalizedEmail.equals(user.getEmail())) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "아이디와 이메일이 일치하는 계정이 없습니다");
+        }
+        return user;
+    }
+
+    private void updatePassword(Long userId, String newPassword) {
+        userMapper.updatePassword(userId, passwordEncoder.encode(newPassword));
     }
 
     private void createDefaultCategories(Long userId) {
