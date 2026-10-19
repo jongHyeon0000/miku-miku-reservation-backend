@@ -3,6 +3,7 @@ package com.jong.mikumikureservationbackend.controller.auth;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
+import com.jong.mikumikureservationbackend.vo.user.ChangePasswordRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.EmailVerificationVO;
 import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
 import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
@@ -20,6 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -185,6 +187,25 @@ public class AuthController {
     @GetMapping("/me")
     public ApiResponse<UserVO> getMe() {
         return ApiResponse.ok("조회가 완료되었습니다.", authService.getMe(currentUser.getId()));
+    }
+
+    @Operation(
+            summary = "비밀번호 변경 (예: 현재 비밀번호 확인 후 새 비밀번호로 변경)",
+            description = "요청 본문: currentPassword: 현재 비밀번호 (본문, 필수), newPassword: 새 비밀번호 (본문, 필수, 8~20자)\n\n"
+                    + "응답: 성공 시 data 없음")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "변경 예",
+                    value = "{\"currentPassword\":\"password1234\",\"newPassword\":\"newPassword1234\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "현재 비밀번호 불일치, 입력값 오류"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조")
+    })
+    @PatchMapping("/password")
+    public ApiResponse<Void> changePassword(@Valid @RequestBody ChangePasswordRequestVO request) {
+        authService.changePassword(currentUser.getId(), request.getCurrentPassword(), request.getNewPassword());
+        return ApiResponse.ok("비밀번호가 변경되었습니다.");
     }
 
     @Operation(

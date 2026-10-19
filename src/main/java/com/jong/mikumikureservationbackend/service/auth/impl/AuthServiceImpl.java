@@ -140,6 +140,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        UserVO user = getMe(userId);
+        try {
+            authenticationManager.authenticate(
+                    UsernamePasswordAuthenticationToken.unauthenticated(user.getLoginId(), currentPassword));
+        } catch (AuthenticationException e) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "현재 비밀번호가 일치하지 않습니다");
+        }
+        updatePassword(userId, newPassword);
+    }
+
+    @Override
     public LoginResponse login(LoginRequestVO request) {
         Authentication authentication;
         try {
