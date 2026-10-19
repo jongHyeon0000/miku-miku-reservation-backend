@@ -3,6 +3,7 @@ package com.jong.mikumikureservationbackend.controller.auth;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
+import com.jong.mikumikureservationbackend.vo.user.EmailVerificationVO;
 import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
@@ -32,8 +33,29 @@ public class AuthController {
     private final CurrentUser currentUser;
 
     @Operation(
+            summary = "가입용 이메일 인증 코드 발송 (예: 가입할 이메일로 6자리 코드 받기)",
+            description = "인증이 필요 없다(토큰 없이 호출). 가입 순서: 이 API로 코드 받기 → POST /api/auth/email-verification/verify로 코드 확인 → POST /api/auth/signup으로 가입\n\n"
+                    + "요청 본문: email: 이메일 (본문, 필수, 100자 이하)\n\n"
+                    + "규칙: 아직 가입되지 않은 이메일만 발송한다. 코드는 6자리 숫자이고 10분 동안 유효하며, 같은 이메일은 60초 뒤에 다시 받을 수 있다.\n\n"
+                    + "응답: 성공 시 data 없음")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "발송 예", value = "{\"email\":\"jong@example.com\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 이미 가입된 이메일, 60초 안에 재요청"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "메일 발송 실패")
+    })
+    @PostMapping("/signup/email-code")
+    public ApiResponse<Void> sendSignupEmailCode(@Valid @RequestBody EmailVerificationVO request) {
+        authService.sendSignupEmailCode(request.getEmail());
+        return ApiResponse.ok("인증 코드를 메일로 보냈습니다.");
+    }
+
+    @Operation(
             summary = "회원가입 (예: 아이디 jong1234, 닉네임 종현)",
-            description = "인증이 필요 없다(토큰 없이 호출).\n\n"
+            description = "인증이 필요 없다(토큰 없이 호출). 가입 전에 이메일 인증(코드 발송과 확인)을 끝내야 한다.\n\n"
                     + "요청 본문: loginId: 로그인 아이디 (본문, 필수, 영문과 숫자 4~30자), email: 이메일 (본문, 필수, 100자 이하), name: 닉네임 (본문, 필수, 20자 이하), password: 비밀번호 (본문, 필수, 8~20자)\n\n"
                     + "응답: 가입한 userId, loginId, email, name, createdAt, updatedAt (비밀번호 관련 값 없음)")
     @SecurityRequirements
@@ -43,7 +65,7 @@ public class AuthController {
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가입한 userId, loginId, email, name, createdAt, updatedAt (비밀번호 관련 값 없음)"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "아이디 또는 이메일 중복, 입력값 오류")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "아이디 또는 이메일 중복, 입력값 오류, 이메일 인증 미완료")
     })
     @PostMapping("/signup")
     public ApiResponse<UserVO> signup(@Valid @RequestBody UserVO request) {

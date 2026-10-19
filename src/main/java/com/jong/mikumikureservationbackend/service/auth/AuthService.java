@@ -9,6 +9,9 @@ public interface AuthService {
     /* 가입 시 분류 9개의 기본 '기타'도 만든다 */
     UserVO signup(UserVO request);
 
+    /* 가입용 인증 코드를 메일로 보낸다. 이미 가입된 이메일이면 거절한다 */
+    void sendSignupEmailCode(String email);
+
     LoginResponse login(LoginRequestVO request);
 
     UserVO getMe(Long userId);

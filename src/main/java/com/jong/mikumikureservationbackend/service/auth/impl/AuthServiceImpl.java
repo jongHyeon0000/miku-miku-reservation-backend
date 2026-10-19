@@ -1,6 +1,7 @@
 package com.jong.mikumikureservationbackend.service.auth.impl;
 
 import com.jong.mikumikureservationbackend.common.constant.CategoryConstant;
+import com.jong.mikumikureservationbackend.common.constant.EmailVerificationPurpose;
 import com.jong.mikumikureservationbackend.common.constant.GlobalExceptionCode;
 import com.jong.mikumikureservationbackend.common.exception.BusinessException;
 import com.jong.mikumikureservationbackend.common.security.AuthUser;
@@ -17,6 +18,7 @@ import com.jong.mikumikureservationbackend.mapper.type.FigureTypeGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.type.FigureTypeMapper;
 import com.jong.mikumikureservationbackend.mapper.user.UserMapper;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
+import com.jong.mikumikureservationbackend.service.auth.EmailVerificationService;
 import com.jong.mikumikureservationbackend.service.common.ImageFileStore;
 import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
@@ -55,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final ImageFileStore imageFileStore;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     @Transactional
@@ -73,6 +76,8 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_ACCOUNT, "이미 사용 중인 이메일입니다");
         }
 
+        emailVerificationService.consume(email, EmailVerificationPurpose.SIGNUP);
+
         try {
             userMapper.insert(loginId, email, name, passwordEncoder.encode(request.getPassword()));
         } catch (DuplicateKeyException e) {
@@ -82,6 +87,15 @@ public class AuthServiceImpl implements AuthService {
         Long userId = userMapper.selectLastInsertId();
         createDefaultCategories(userId);
         return userMapper.selectById(userId);
+    }
+
+    @Override
+    public void sendSignupEmailCode(String email) {
+        String normalized = email.trim().toLowerCase(Locale.ROOT);
+        if (userMapper.selectByEmail(normalized) != null) {
+            throw new BusinessException(GlobalExceptionCode.DUPLICATE_ACCOUNT, "이미 사용 중인 이메일입니다");
+        }
+        emailVerificationService.sendCode(normalized, EmailVerificationPurpose.SIGNUP);
     }
 
     @Override

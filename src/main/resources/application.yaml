@@ -30,6 +30,10 @@ app:
   upload:
     max-size: 5MB
     allowed-extensions: [jpg, jpeg, png, gif, webp]
+  mail:
+    # 인증 메일의 보낸 사람(주소는 SMTP 로그인 계정과 같아야 한다)
+    from-address: ${spring.mail.username}
+    from-name: 미쿠미쿠예약시스템
   jwt:
     # 로그인 토큰 유효 시간(시간 단위). 서명 키(app.jwt.secret)는 프로파일별 파일에서 받는다
     expiration-hours: 24
