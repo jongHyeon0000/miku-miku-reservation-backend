@@ -4,6 +4,7 @@ import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
 import com.jong.mikumikureservationbackend.vo.user.EmailVerificationVO;
+import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
 import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
@@ -70,6 +71,45 @@ public class AuthController {
     @PostMapping("/signup")
     public ApiResponse<UserVO> signup(@Valid @RequestBody UserVO request) {
         return ApiResponse.ok("가입이 완료되었습니다.", authService.signup(request));
+    }
+
+    @Operation(
+            summary = "아이디 찾기용 이메일 인증 코드 발송 (예: 가입한 이메일로 6자리 코드 받기)",
+            description = "인증이 필요 없다(토큰 없이 호출). 아이디 찾기 순서: 이 API로 코드 받기 → POST /api/auth/email-verification/verify(purpose: FIND_ID)로 코드 확인 → POST /api/auth/find-id로 아이디 받기\n\n"
+                    + "요청 본문: email: 이메일 (본문, 필수, 100자 이하)\n\n"
+                    + "규칙: 가입된 이메일만 발송한다. 코드는 6자리 숫자이고 10분 동안 유효하며, 같은 이메일은 60초 뒤에 다시 받을 수 있다.\n\n"
+                    + "응답: 성공 시 data 없음")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "발송 예", value = "{\"email\":\"jong@example.com\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 가입되지 않은 이메일, 60초 안에 재요청"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "메일 발송 실패")
+    })
+    @PostMapping("/find-id/email-code")
+    public ApiResponse<Void> sendFindIdEmailCode(@Valid @RequestBody EmailVerificationVO request) {
+        authService.sendFindIdEmailCode(request.getEmail());
+        return ApiResponse.ok("인증 코드를 메일로 보냈습니다.");
+    }
+
+    @Operation(
+            summary = "아이디 찾기 (예: 인증을 마친 이메일로 가입한 아이디 확인)",
+            description = "인증이 필요 없다(토큰 없이 호출). 먼저 이메일 인증(코드 발송과 확인, purpose: FIND_ID)을 끝내야 한다.\n\n"
+                    + "요청 본문: email: 이메일 (본문, 필수, 100자 이하)\n\n"
+                    + "응답: loginId: 그 이메일로 가입한 로그인 아이디 (인증은 한 번 쓰면 소모된다)")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "아이디 찾기 예", value = "{\"email\":\"jong@example.com\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "loginId: 그 이메일로 가입한 로그인 아이디"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 이메일 인증 미완료, 가입되지 않은 이메일")
+    })
+    @PostMapping("/find-id")
+    public ApiResponse<FindIdResponse> findId(@Valid @RequestBody EmailVerificationVO request) {
+        return ApiResponse.ok("조회가 완료되었습니다.", authService.findId(request.getEmail()));
     }
 
     @Operation(

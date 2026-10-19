@@ -20,6 +20,7 @@ import com.jong.mikumikureservationbackend.mapper.user.UserMapper;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
 import com.jong.mikumikureservationbackend.service.auth.EmailVerificationService;
 import com.jong.mikumikureservationbackend.service.common.ImageFileStore;
+import com.jong.mikumikureservationbackend.vo.user.FindIdResponse;
 import com.jong.mikumikureservationbackend.vo.user.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.LoginResponse;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
@@ -96,6 +97,26 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_ACCOUNT, "이미 사용 중인 이메일입니다");
         }
         emailVerificationService.sendCode(normalized, EmailVerificationPurpose.SIGNUP);
+    }
+
+    @Override
+    public void sendFindIdEmailCode(String email) {
+        String normalized = email.trim().toLowerCase(Locale.ROOT);
+        if (userMapper.selectByEmail(normalized) == null) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "가입된 이메일이 아닙니다");
+        }
+        emailVerificationService.sendCode(normalized, EmailVerificationPurpose.FIND_ID);
+    }
+
+    @Override
+    public FindIdResponse findId(String email) {
+        String normalized = email.trim().toLowerCase(Locale.ROOT);
+        emailVerificationService.consume(normalized, EmailVerificationPurpose.FIND_ID);
+        UserVO user = userMapper.selectByEmail(normalized);
+        if (user == null) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "가입된 이메일이 아닙니다");
+        }
+        return new FindIdResponse(user.getLoginId());
     }
 
     @Override
