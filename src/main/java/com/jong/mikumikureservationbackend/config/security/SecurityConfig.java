@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/auth/signup/email-code", "/api/auth/find-id/email-code", "/api/auth/find-id", "/api/auth/reset-password/email-code", "/api/auth/reset-password", "/api/auth/email-verification/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, authUserDetailsService),
                         UsernamePasswordAuthenticationFilter.class);

@@ -16,7 +16,6 @@ concurrency:
 env:
   APP_DIR: /opt/miku-miku-reservation
   SERVICE: miku-miku-reservation
-  HEALTH_URL: https://miku-miku-reservation.com/api/auth/me
 
 jobs:
   deploy:
@@ -59,9 +58,10 @@ jobs:
         id: health
         run: |
           for i in $(seq 1 30); do
-            CODE=$(curl -s -o /dev/null -w '%{http_code}' "$HEALTH_URL" || true)
-            echo "try $i: $CODE"
-            if [ "$CODE" = "401" ]; then exit 0; fi
+            BODY=$(ssh -i ~/.ssh/deploy_key "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+              "curl -s localhost:8080/actuator/health" || true)
+            echo "try $i: $BODY"
+            if echo "$BODY" | grep -q '"status":"UP"'; then exit 0; fi
             sleep 3
           done
           exit 1
