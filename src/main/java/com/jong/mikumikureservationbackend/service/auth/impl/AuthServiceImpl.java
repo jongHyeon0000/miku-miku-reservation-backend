@@ -214,7 +214,7 @@ public class AuthServiceImpl implements AuthService {
         String name = CategoryConstant.DEFAULT_NAME;
 
         shopGroupMapper.insert(userId, name, null);
-        shopMapper.insert(userId, shopGroupMapper.selectByName(userId, name).getId(), name, null);
+        shopMapper.insert(userId, shopGroupMapper.selectByName(userId, name).getId(), name, null, null);
 
         figureTypeGroupMapper.insert(userId, name, null);
         figureTypeMapper.insert(userId, figureTypeGroupMapper.selectByName(userId, name).getId(), name, null);

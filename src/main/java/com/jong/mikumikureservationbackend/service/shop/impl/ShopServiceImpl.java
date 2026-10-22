@@ -48,7 +48,7 @@ public class ShopServiceImpl implements ShopService {
         }
         String trimmed = vo.getName().trim();
         try {
-            shopMapper.insert(userId, shopGroupId, trimmed, vo.getDescription());
+            shopMapper.insert(userId, shopGroupId, trimmed, vo.getDescription(), vo.getUrl());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
@@ -64,7 +64,7 @@ public class ShopServiceImpl implements ShopService {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         try {
-            shopMapper.update(userId, shopId, vo.getName().trim(), vo.getDescription());
+            shopMapper.update(userId, shopId, vo.getName().trim(), vo.getDescription(), vo.getUrl());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }

@@ -60,7 +60,7 @@ public class ShopGroupServiceImpl implements ShopGroupService {
         }
         ShopGroupVO parent = shopGroupMapper.selectByName(userId, trimmed);
 
-        shopMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null);
+        shopMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null, null);
         List<ShopVO> children = new ArrayList<>();
         children.add(shopMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);

@@ -20,9 +20,9 @@ public interface ShopMapper {
 
     int countByParent(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId);
 
-    int insert(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId, @Param("name") String name, @Param("description") String description);
+    int insert(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId, @Param("name") String name, @Param("description") String description, @Param("url") String url);
 
-    int update(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("name") String name, @Param("description") String description);
+    int update(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("name") String name, @Param("description") String description, @Param("url") String url);
 
     int delete(@Param("userId") Long userId, @Param("shopId") Long shopId);
 

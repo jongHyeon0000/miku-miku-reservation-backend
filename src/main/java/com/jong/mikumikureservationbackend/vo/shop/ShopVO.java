@@ -44,6 +44,11 @@ public class ShopVO {
     @Size(max = 1000)
     private String description;
 
+    /** 판매처 바로가기 주소 */
+    @Schema(description = "판매처 바로가기 주소 (2000자 이하, 없으면 응답에서 빠진다)", example = "https://www.goodsmile.com")
+    @Size(max = 2000)
+    private String url;
+
     /** 생성일 */
     @Schema(description = "생성일시", example = "2026-10-12T21:30:00")
     private LocalDateTime createdAt;

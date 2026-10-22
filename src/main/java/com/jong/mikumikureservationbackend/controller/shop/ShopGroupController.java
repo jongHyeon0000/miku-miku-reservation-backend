@@ -35,7 +35,7 @@ public class ShopGroupController {
 
     @Operation(
             summary = "판매처 채널 목록 조회, 하위 판매처 스토어 중첩 (예: 네이버 스토어)",
-            description = "응답: id, name, description, thumbnailUrl, children(판매처 스토어 목록: id, groupId, name, description, thumbnailUrl)")
+            description = "응답: id, name, description, thumbnailUrl, children(판매처 스토어 목록: id, groupId, name, description, url(없으면 생략), thumbnailUrl)")
     @GetMapping
     public ApiResponse<List<ShopGroupVO>> getTree() {
         return ApiResponse.ok("조회가 완료되었습니다.", shopGroupService.getTree(currentUser.getId()));

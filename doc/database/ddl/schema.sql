@@ -45,6 +45,7 @@ CREATE TABLE shop (
   shop_group_id BIGINT       NOT NULL COMMENT '상위 채널',
   name          VARCHAR(100) NOT NULL COMMENT '스토어명 (굿스마일 pw, 코믹스아트 등)',
   description   VARCHAR(1000) NULL COMMENT '설명 (일반 텍스트)',
+  url           VARCHAR(2000) NULL COMMENT '판매처 바로가기 주소',
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (shop_id),
