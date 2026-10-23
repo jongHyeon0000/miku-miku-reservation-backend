@@ -44,3 +44,6 @@ src/main/resources/application-local.yaml
 /doc/*
 !/doc/database/
 !/doc/readme/
+
+### Claude 지침 파일 ###
+/CLAUDE.md

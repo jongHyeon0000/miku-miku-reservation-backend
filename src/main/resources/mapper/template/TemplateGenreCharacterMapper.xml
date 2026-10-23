@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.template.TemplateGenreCharacterMapper">
+
+    <!-- 가져오면 새로 추가될 항목 수: 내 genre_character_group 중 같은 이름의 상위 안에 같은 이름이 없는 것 -->
+    <select id="selectAddCount" resultType="int">
+        SELECT COUNT(*)
+        FROM template_genre_character i
+        JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id
+        WHERE g.template_id = #{templateId}
+          AND NOT EXISTS (
+              SELECT 1 FROM genre_character_group e
+              JOIN genre_character c ON c.user_id = e.user_id AND c.genre_character_group_id = e.genre_character_group_id
+              WHERE e.user_id = #{userId} AND e.name = g.name AND c.name = i.name
+          )
+    </select>
+
+    <!-- 이미 있어서 제외될 항목 -->
+    <select id="selectSkipped" resultType="TemplateSkippedItemVO">
+        SELECT g.name AS group_name, i.name AS name
+        FROM template_genre_character i
+        JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id
+        JOIN genre_character_group e ON e.user_id = #{userId} AND e.name = g.name
+        JOIN genre_character c ON c.user_id = e.user_id AND c.genre_character_group_id = e.genre_character_group_id AND c.name = i.name
+        WHERE g.template_id = #{templateId}
+        ORDER BY g.template_genre_character_group_id, i.template_genre_character_id
+    </select>
+
+    <!-- 새로 만든 행만 골라내려는 기준 id (이 사용자의 현재 최대 id) -->
+    <select id="selectMaxGroupId" resultType="long">
+        SELECT COALESCE(MAX(genre_character_group_id), 0) FROM genre_character_group WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectMaxItemId" resultType="long">
+        SELECT COALESCE(MAX(genre_character_id), 0) FROM genre_character WHERE user_id = #{userId}
+    </select>
+
+    <!-- 1단계: 내게 없는 상위만 만든다. 있는 상위에는 합쳐 넣는다 -->
+    <insert id="insertGroups">
+        INSERT INTO genre_character_group (user_id, name, description)
+        SELECT #{userId}, g.name, g.description
+        FROM template_genre_character_group g
+        WHERE g.template_id = #{templateId}
+          AND NOT EXISTS (SELECT 1 FROM genre_character_group e WHERE e.user_id = #{userId} AND e.name = g.name)
+    </insert>
+
+    <!-- 2단계: 상위를 만들 때는 기본 하위(기타)도 같이 만든다. 이미 기타가 있는 상위는 건드리지 않는다 -->
+    <insert id="insertDefaultItems">
+        INSERT INTO genre_character (user_id, genre_character_group_id, name)
+        SELECT e.user_id, e.genre_character_group_id, #{defaultName}
+        FROM genre_character_group e
+        JOIN template_genre_character_group g ON g.name = e.name AND g.template_id = #{templateId}
+        WHERE e.user_id = #{userId}
+          AND NOT EXISTS (
+              SELECT 1 FROM genre_character c
+              WHERE c.user_id = e.user_id AND c.genre_character_group_id = e.genre_character_group_id AND c.name = #{defaultName}
+          )
+    </insert>
+
+    <!-- 3단계: 같은 이름이 없는 항목만 넣는다 -->
+    <insert id="insertItems">
+        INSERT INTO genre_character (user_id, genre_character_group_id, name, description)
+        SELECT #{userId}, e.genre_character_group_id, i.name, i.description
+        FROM template_genre_character i
+        JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id
+        JOIN genre_character_group e ON e.user_id = #{userId} AND e.name = g.name
+        WHERE g.template_id = #{templateId}
+          AND NOT EXISTS (
+              SELECT 1 FROM genre_character c
+              WHERE c.user_id = e.user_id AND c.genre_character_group_id = e.genre_character_group_id AND c.name = i.name
+          )
+    </insert>
+
+    <!-- 이번에 새로 만든 상위에만 템플릿의 공용 이미지를 연결한다 (파일 복사 없음, 경로만 같이 쓴다) -->
+    <insert id="insertGroupThumbnails">
+        INSERT INTO thumbnail_image (user_id, target_type, target_id, file_path, original_name, file_size)
+        SELECT #{userId}, 'GENRE_CHARACTER_GROUP', e.genre_character_group_id, t.file_path, t.original_name, t.file_size
+        FROM template_genre_character_group g
+        JOIN genre_character_group e ON e.user_id = #{userId} AND e.name = g.name
+        JOIN thumbnail_image t ON t.target_type = 'TEMPLATE_GENRE_CHARACTER_GROUP' AND t.target_id = g.template_genre_character_group_id
+        WHERE g.template_id = #{templateId} AND e.genre_character_group_id &gt; #{maxGroupId}
+    </insert>
+
+    <!-- 이번에 새로 만든 항목에만 공용 이미지를 연결한다. 이미 있던 항목은 건드리지 않는다 -->
+    <insert id="insertItemThumbnails">
+        INSERT INTO thumbnail_image (user_id, target_type, target_id, file_path, original_name, file_size)
+        SELECT #{userId}, 'GENRE_CHARACTER', c.genre_character_id, t.file_path, t.original_name, t.file_size
+        FROM template_genre_character i
+        JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id
+        JOIN genre_character_group e ON e.user_id = #{userId} AND e.name = g.name
+        JOIN genre_character c ON c.user_id = e.user_id AND c.genre_character_group_id = e.genre_character_group_id AND c.name = i.name
+        JOIN thumbnail_image t ON t.target_type = 'TEMPLATE_GENRE_CHARACTER' AND t.target_id = i.template_genre_character_id
+        WHERE g.template_id = #{templateId} AND c.genre_character_id &gt; #{maxItemId}
+    </insert>
+
+</mapper>

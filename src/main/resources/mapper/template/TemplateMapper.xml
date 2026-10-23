@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.template.TemplateMapper">
+
+    <!-- 한 템플릿은 한 종류만 채우므로 다섯 종류의 하위 항목 수를 더하면 그 템플릿의 항목 수가 된다 -->
+    <select id="selectAll" resultType="TemplateVO">
+        SELECT t.template_id, t.template_type, t.name, t.description,
+               (
+               (SELECT COUNT(*) FROM template_shop i JOIN template_shop_group g ON g.template_shop_group_id = i.template_shop_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_figure_type i JOIN template_figure_type_group g ON g.template_figure_type_group_id = i.template_figure_type_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_series i JOIN template_series_group g ON g.template_series_group_id = i.template_series_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_genre_character i JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_maker i WHERE i.template_id = t.template_id)
+           ) AS item_count,
+               CONCAT('/uploads/', th.file_path) AS thumbnail_url
+        FROM template t
+        LEFT JOIN thumbnail_image th ON th.target_type = 'TEMPLATE' AND th.target_id = t.template_id
+        WHERE #{templateType,jdbcType=VARCHAR} IS NULL OR t.template_type = #{templateType,jdbcType=VARCHAR}
+        ORDER BY t.template_type, t.name
+    </select>
+
+    <select id="selectById" resultType="TemplateVO">
+        SELECT t.template_id, t.template_type, t.name, t.description,
+               (
+               (SELECT COUNT(*) FROM template_shop i JOIN template_shop_group g ON g.template_shop_group_id = i.template_shop_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_figure_type i JOIN template_figure_type_group g ON g.template_figure_type_group_id = i.template_figure_type_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_series i JOIN template_series_group g ON g.template_series_group_id = i.template_series_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_genre_character i JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id WHERE g.template_id = t.template_id)
+             + (SELECT COUNT(*) FROM template_maker i WHERE i.template_id = t.template_id)
+           ) AS item_count,
+               CONCAT('/uploads/', th.file_path) AS thumbnail_url
+        FROM template t
+        LEFT JOIN thumbnail_image th ON th.target_type = 'TEMPLATE' AND th.target_id = t.template_id
+        WHERE t.template_id = #{templateId}
+    </select>
+
+</mapper>

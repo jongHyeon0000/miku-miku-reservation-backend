@@ -68,7 +68,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
 
         imageFileStore.save(file, filePath);   // 실패하면 예외로 DB 변경도 롤백된다
         if (old != null) {
-            imageFileStore.delete(old.getFilePath());
+            deleteOwnFile(userId, old.getFilePath());
         }
         return new ThumbnailUrlResponseVO(UploadConstant.URL_PREFIX + filePath);
     }
@@ -80,7 +80,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
         ThumbnailImageVO old = thumbnailImageMapper.selectByTarget(userId, target, targetId);
         if (old != null) {
             thumbnailImageMapper.deleteByTarget(userId, target, targetId);
-            imageFileStore.delete(old.getFilePath());
+            deleteOwnFile(userId, old.getFilePath());
         }
     }
 
@@ -96,6 +96,13 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
         }
         thumbnailImageMapper.deleteByTargets(userId, target, targetIds);
         for (String filePath : filePaths) {
+            deleteOwnFile(userId, filePath);
+        }
+    }
+
+    /* 템플릿에서 가져온 썸네일은 공용 파일(template/ 폴더)을 같이 쓰므로, 내 폴더({userId}/) 안의 파일만 지운다 */
+    private void deleteOwnFile(Long userId, String filePath) {
+        if (filePath.startsWith(userId + "/")) {
             imageFileStore.delete(filePath);
         }
     }
@@ -139,6 +146,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
                 exists = userMapper.selectById(userId) != null && userId.equals(targetId);
                 break;
             default:
+                // 템플릿 종류는 업로드 대상이 아니라 여기서 404가 된다
                 exists = false;
         }
         if (!exists) {

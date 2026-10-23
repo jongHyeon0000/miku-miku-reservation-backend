@@ -15,7 +15,19 @@ public enum ThumbnailTarget {
     GENRE_CHARACTER_GROUP("genre-character-group"),
     GENRE_CHARACTER("genre-character"),
     MAKER("maker"),
-    USER("user");
+    USER("user"),
+
+    // 템플릿의 공식 이미지(개발자 계정 소유). 업로드 API의 대상이 아니라 가져오기 SQL이 읽는다
+    TEMPLATE("template"),
+    TEMPLATE_SHOP_GROUP("template-shop-group"),
+    TEMPLATE_SHOP("template-shop"),
+    TEMPLATE_FIGURE_TYPE_GROUP("template-figure-type-group"),
+    TEMPLATE_FIGURE_TYPE("template-figure-type"),
+    TEMPLATE_SERIES_GROUP("template-series-group"),
+    TEMPLATE_SERIES("template-series"),
+    TEMPLATE_GENRE_CHARACTER_GROUP("template-genre-character-group"),
+    TEMPLATE_GENRE_CHARACTER("template-genre-character"),
+    TEMPLATE_MAKER("template-maker");
 
     private final String urlValue;
 
