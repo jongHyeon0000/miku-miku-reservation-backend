@@ -17,11 +17,13 @@
 
     <!-- 이미 있어서 제외될 항목 -->
     <select id="selectSkipped" resultType="TemplateSkippedItemVO">
-        SELECT g.name AS group_name, i.name AS name
+        SELECT g.name AS group_name, i.name AS name, i.description AS description,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM template_shop i
         JOIN template_shop_group g ON g.template_shop_group_id = i.template_shop_group_id
         JOIN shop_group e ON e.user_id = #{userId} AND e.name = g.name
         JOIN shop c ON c.user_id = e.user_id AND c.shop_group_id = e.shop_group_id AND c.name = i.name
+        LEFT JOIN thumbnail_image t ON t.target_type = 'TEMPLATE_SHOP' AND t.target_id = i.template_shop_id
         WHERE g.template_id = #{templateId}
         ORDER BY g.template_shop_group_id, i.template_shop_id
     </select>

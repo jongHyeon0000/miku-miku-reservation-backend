@@ -17,11 +17,13 @@
 
     <!-- 이미 있어서 제외될 항목 -->
     <select id="selectSkipped" resultType="TemplateSkippedItemVO">
-        SELECT g.name AS group_name, i.name AS name
+        SELECT g.name AS group_name, i.name AS name, i.description AS description,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM template_genre_character i
         JOIN template_genre_character_group g ON g.template_genre_character_group_id = i.template_genre_character_group_id
         JOIN genre_character_group e ON e.user_id = #{userId} AND e.name = g.name
         JOIN genre_character c ON c.user_id = e.user_id AND c.genre_character_group_id = e.genre_character_group_id AND c.name = i.name
+        LEFT JOIN thumbnail_image t ON t.target_type = 'TEMPLATE_GENRE_CHARACTER' AND t.target_id = i.template_genre_character_id
         WHERE g.template_id = #{templateId}
         ORDER BY g.template_genre_character_group_id, i.template_genre_character_id
     </select>

@@ -14,6 +14,7 @@ import com.jong.mikumikureservationbackend.service.template.TemplateService;
 import com.jong.mikumikureservationbackend.vo.template.TemplateImportResponseVO;
 import com.jong.mikumikureservationbackend.vo.template.TemplatePreviewResponseVO;
 import com.jong.mikumikureservationbackend.vo.template.TemplateSkippedGroupVO;
+import com.jong.mikumikureservationbackend.vo.template.TemplateSkippedItemResponseVO;
 import com.jong.mikumikureservationbackend.vo.template.TemplateSkippedItemVO;
 import com.jong.mikumikureservationbackend.vo.template.TemplateVO;
 import lombok.RequiredArgsConstructor;
@@ -185,22 +186,22 @@ public class TemplateServiceImpl implements TemplateService {
 
     /* 제외 항목을 상위 그룹 이름별로 묶는다 (조회 순서 유지, 제조사는 상위가 없어 groupName이 null 하나로 묶인다) */
     private List<TemplateSkippedGroupVO> groupSkipped(List<TemplateSkippedItemVO> skipped) {
-        Map<String, List<String>> grouped = new LinkedHashMap<>();
+        Map<String, List<TemplateSkippedItemResponseVO>> grouped = new LinkedHashMap<>();
 
-        for (TemplateSkippedItemVO item : skipped) {
-            List<String> names = grouped.get(item.getGroupName());
+        for (TemplateSkippedItemVO row : skipped) {
+            List<TemplateSkippedItemResponseVO> items = grouped.get(row.getGroupName());
 
-            if (names == null) {
-                names = new ArrayList<>();
-                grouped.put(item.getGroupName(), names);
+            if (items == null) {
+                items = new ArrayList<>();
+                grouped.put(row.getGroupName(), items);
             }
 
-            names.add(item.getName());
+            items.add(new TemplateSkippedItemResponseVO(row.getName(), row.getDescription(), row.getThumbnailUrl()));
         }
 
         List<TemplateSkippedGroupVO> result = new ArrayList<>();
 
-        for (Map.Entry<String, List<String>> entry : grouped.entrySet()) {
+        for (Map.Entry<String, List<TemplateSkippedItemResponseVO>> entry : grouped.entrySet()) {
             result.add(new TemplateSkippedGroupVO(entry.getKey(), entry.getValue()));
         }
 

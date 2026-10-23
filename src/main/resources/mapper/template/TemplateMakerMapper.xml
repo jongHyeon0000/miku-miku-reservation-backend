@@ -12,9 +12,11 @@
 
     <!-- 이미 있어서 제외될 제조사 (상위가 없어 group_name은 null) -->
     <select id="selectSkipped" resultType="TemplateSkippedItemVO">
-        SELECT i.name AS name
+        SELECT i.name AS name, i.description AS description,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM template_maker i
         JOIN maker m ON m.user_id = #{userId} AND m.name = i.name
+        LEFT JOIN thumbnail_image t ON t.target_type = 'TEMPLATE_MAKER' AND t.target_id = i.template_maker_id
         WHERE i.template_id = #{templateId}
         ORDER BY i.template_maker_id
     </select>
