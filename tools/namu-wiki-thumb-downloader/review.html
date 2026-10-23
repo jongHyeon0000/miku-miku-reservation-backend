@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>템플릿 이미지 검토</title>
+<style>
+  :root {
+    --bg: #14121f;
+    --card: #1f1b33;
+    --line: #3a3260;
+    --text: #f1eefc;
+    --sub: #948db2;
+    --gold: #e8b654;
+    --bad: #e8735f;
+    --ok: #7bd88f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, 'Noto Sans KR', sans-serif; line-height: 1.5; }
+  header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 0.75rem 1.25rem; background: var(--card); border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 1.1rem; }
+  header .summary { color: var(--sub); font-size: 0.9rem; flex: 1; }
+  button { font: inherit; color: var(--text); background: transparent; border: 1px solid var(--line); border-radius: 0.5rem; padding: 0.35rem 0.8rem; cursor: pointer; }
+  button:hover { border-color: var(--gold); }
+  button.primary { background: var(--gold); border-color: var(--gold); color: #14121f; font-weight: 700; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  section h2 { margin: 0; padding: 1rem 1.25rem 0; font-size: 1rem; color: var(--gold); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 1rem; padding: 1rem 1.25rem 1.5rem; }
+  .card { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.75rem; background: var(--card); border: 1px solid var(--line); border-radius: 0.75rem; }
+  .card.excluded { opacity: 0.4; }
+  .card.low { border-color: var(--bad); }
+  .thumb { width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #0f0d1c; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 0.85rem; text-align: center; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .title { font-weight: 700; word-break: break-all; }
+  .meta { font-size: 0.8rem; color: var(--sub); }
+  .badge-high { color: var(--ok); }
+  .badge-low { color: var(--bad); }
+  .error { color: var(--bad); font-size: 0.85rem; }
+  input[type=text] { width: 100%; font: inherit; font-size: 0.85rem; color: var(--text); background: #0f0d1c; border: 1px solid var(--line); border-radius: 0.4rem; padding: 0.3rem 0.5rem; }
+  .row { display: flex; gap: 0.5rem; align-items: center; justify-content: space-between; }
+  .row label { font-size: 0.85rem; color: var(--sub); display: flex; gap: 0.3rem; align-items: center; cursor: pointer; }
+  .cands { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; }
+  .cands[hidden] { display: none; }
+  .cand { padding: 0; border: 2px solid transparent; border-radius: 0.4rem; overflow: hidden; aspect-ratio: 1 / 1; background: #0f0d1c; }
+  .cand.selected { border-color: var(--gold); }
+  .cand img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cand-info { font-size: 0.75rem; color: var(--sub); }
+  a { color: var(--sub); }
+  #result { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.7); }
+  #result .box { width: min(36rem, 92vw); max-height: 80vh; overflow: auto; padding: 1.25rem; background: var(--card); border: 1px solid var(--line); border-radius: 0.75rem; }
+  #result li { font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>템플릿 이미지 검토</h1>
+  <div class="summary" id="summary">불러오는 중...</div>
+  <button class="primary" id="saveButton" disabled>저장</button>
+</header>
+<section>
+  <h2 id="lowTitle"></h2>
+  <div class="grid" id="lowGrid"></div>
+</section>
+<section>
+  <h2 id="highTitle"></h2>
+  <div class="grid" id="highGrid"></div>
+</section>
+<div id="result"><div class="box" id="resultBox"></div></div>
+
+<script>
+  var items = [];
+  var choice = {};
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+
+    return node;
+  }
+
+  /* 가로가 긴 사진은 가운데, 세로가 긴 사진은 위쪽 기준으로 보여 준다 (저장할 때 자르는 방식과 같다) */
+  function fitCrop(image) {
+    image.style.objectPosition = image.naturalWidth > image.naturalHeight ? 'center' : 'top';
+  }
+
+  function makeImage(itemId, candidateIndex) {
+    var image = el('img');
+
+    image.loading = 'lazy';
+    image.src = '/img/' + itemId + '/' + candidateIndex;
+    image.onload = function () { fitCrop(image); };
+
+    return image;
+  }
+
+  function candidateLabel(candidate) {
+    var size = candidate.side ? candidate.side + 'px' : '크기 모름';
+
+    return candidate.origin + ' · ' + candidate.score + '점 · ' + size;
+  }
+
+  function updateCard(card, item) {
+    var state = choice[item.id];
+    var thumb = card.querySelector('.thumb');
+    var info = card.querySelector('.cand-info');
+    var selected = item.candidates[state.candidate];
+
+    thumb.textContent = '';
+    thumb.appendChild(makeImage(item.id, state.candidate));
+    info.textContent = candidateLabel(selected) + (selected.alt ? ' · ' + selected.alt : '');
+    card.classList.toggle('excluded', state.excluded);
+
+    card.querySelectorAll('.cand').forEach(function (button, index) {
+      button.classList.toggle('selected', index === state.candidate);
+    });
+
+    updateSummary();
+  }
+
+  function makeCard(item) {
+    var card = el('div', 'card' + (item.confidence === 'high' ? '' : ' low'));
+    var link = el('a', 'title', item.title);
+
+    link.href = item.url;
+    link.target = '_blank';
+    card.appendChild(link);
+
+    if (item.error || item.candidates.length === 0) {
+      card.appendChild(el('div', 'thumb', item.error ? '받기 실패' : '후보 없음'));
+      card.appendChild(el('div', 'error', item.error ? item.error : '소개 상자에서 사진을 찾지 못했습니다'));
+
+      return card;
+    }
+
+    var state = choice[item.id];
+    var badgeClass = item.confidence === 'high' ? 'badge-high' : 'badge-low';
+    var badgeText = item.confidence === 'high' ? '확신 높음' : '확신 낮음';
+    var meta = el('div', 'meta');
+    var badge = el('span', badgeClass, badgeText);
+
+    card.appendChild(el('div', 'thumb'));
+    meta.appendChild(badge);
+    card.appendChild(meta);
+    card.appendChild(el('div', 'cand-info'));
+
+    var nameInput = el('input');
+
+    nameInput.type = 'text';
+    nameInput.value = state.name;
+    nameInput.oninput = function () { state.name = nameInput.value; };
+    card.appendChild(nameInput);
+
+    var cands = el('div', 'cands');
+
+    cands.hidden = item.confidence === 'high';
+    item.candidates.forEach(function (candidate, index) {
+      var button = el('button', 'cand');
+
+      button.title = candidateLabel(candidate) + (candidate.alt ? ' · ' + candidate.alt : '');
+      button.appendChild(makeImage(item.id, index));
+      button.onclick = function () {
+        state.candidate = index;
+        updateCard(card, item);
+      };
+      cands.appendChild(button);
+    });
+
+    var row = el('div', 'row');
+    var toggle = el('button', '', '다른 후보');
+    var excludeLabel = el('label');
+    var excludeBox = el('input');
+
+    toggle.onclick = function () { cands.hidden = !cands.hidden; };
+    excludeBox.type = 'checkbox';
+    excludeBox.onchange = function () {
+      state.excluded = excludeBox.checked;
+      updateCard(card, item);
+    };
+    excludeLabel.appendChild(excludeBox);
+    excludeLabel.appendChild(document.createTextNode('제외'));
+    row.appendChild(toggle);
+    row.appendChild(excludeLabel);
+    card.appendChild(row);
+    card.appendChild(cands);
+    updateCard(card, item);
+
+    return card;
+  }
+
+  function usable(item) {
+    return !item.error && item.candidates.length > 0;
+  }
+
+  function updateSummary() {
+    var total = items.length;
+    var low = items.filter(function (item) { return !usable(item) || item.confidence !== 'high'; }).length;
+    var excluded = items.filter(function (item) { return !usable(item) || choice[item.id].excluded; }).length;
+
+    document.getElementById('summary').textContent = '전체 ' + total + '개 · 확인 필요 ' + low + '개 · 저장 제외 ' + excluded + '개 · 저장 ' + (total - excluded) + '개';
+  }
+
+  function render() {
+    var low = items.filter(function (item) { return !usable(item) || item.confidence !== 'high'; });
+    var high = items.filter(function (item) { return usable(item) && item.confidence === 'high'; });
+
+    document.getElementById('lowTitle').textContent = '확인 필요 (' + low.length + ')';
+    document.getElementById('highTitle').textContent = '확신 높음 (' + high.length + ')';
+    low.forEach(function (item) { document.getElementById('lowGrid').appendChild(makeCard(item)); });
+    high.forEach(function (item) { document.getElementById('highGrid').appendChild(makeCard(item)); });
+    document.getElementById('saveButton').disabled = false;
+    updateSummary();
+  }
+
+  function showResult(results) {
+    var box = document.getElementById('resultBox');
+    var saved = results.filter(function (result) { return !result.error; });
+
+    box.textContent = '';
+    box.appendChild(el('h2', '', '저장 완료: ' + saved.length + '개'));
+
+    var list = el('ul');
+
+    results.forEach(function (result) {
+      var text = result.error ? result.title + ' : 실패 ' + result.error : result.title + ' → ' + result.file + ' (원본 ' + result.side + 'px)';
+
+      list.appendChild(el('li', result.error ? 'error' : '', text));
+    });
+    box.appendChild(list);
+    box.appendChild(el('p', 'meta', 'tools/output/ 에 저장했습니다. 이 창은 닫아도 됩니다.'));
+    document.getElementById('result').style.display = 'flex';
+  }
+
+  document.getElementById('saveButton').onclick = function () {
+    var button = document.getElementById('saveButton');
+    var picks = items.filter(function (item) { return usable(item) && !choice[item.id].excluded; }).map(function (item) {
+      return { id: item.id, candidate: choice[item.id].candidate, name: choice[item.id].name };
+    });
+
+    if (!confirm(picks.length + '개를 저장할까요?')) return;
+
+    button.disabled = true;
+    fetch('/api/save', { method: 'POST', body: JSON.stringify(picks) })
+      .then(function (response) { return response.json(); })
+      .then(showResult)
+      .catch(function () { button.disabled = false; alert('저장에 실패했습니다'); });
+  };
+
+  fetch('/api/items')
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+      items = data;
+      items.forEach(function (item) { choice[item.id] = { candidate: 0, name: item.name, excluded: false }; });
+      render();
+    });
+</script>
+</body>
+</html>
