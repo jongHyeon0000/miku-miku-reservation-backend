@@ -76,6 +76,7 @@ public class SeriesGroupController {
             @Parameter(description = "수정할 시리즈 그룹 id", example = "1") @PathVariable Long seriesGroupId,
             @Valid @RequestBody SeriesGroupVO request) {
         seriesGroupService.update(currentUser.getId(), seriesGroupId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -91,6 +92,7 @@ public class SeriesGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 시리즈 그룹 id", example = "1") @PathVariable Long seriesGroupId) {
         seriesGroupService.delete(currentUser.getId(), seriesGroupId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

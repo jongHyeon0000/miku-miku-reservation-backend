@@ -77,6 +77,7 @@ public class FigureTypeController {
             @Parameter(description = "수정할 형태 하위 id", example = "1") @PathVariable Long figureTypeId,
             @Valid @RequestBody FigureTypeVO request) {
         figureTypeService.update(currentUser.getId(), figureTypeId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -92,6 +93,7 @@ public class FigureTypeController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 형태 하위 id", example = "1") @PathVariable Long figureTypeId) {
         figureTypeService.delete(currentUser.getId(), figureTypeId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

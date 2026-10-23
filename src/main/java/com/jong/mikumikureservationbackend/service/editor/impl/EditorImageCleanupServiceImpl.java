@@ -26,6 +26,7 @@ public class EditorImageCleanupServiceImpl implements EditorImageCleanupService 
         List<EditorImageVO> orphans = editorImageMapper.selectOrphans(UploadConstant.ORPHAN_RETENTION_DAYS);
         int deleted = 0;
         int failed = 0;
+
         for (EditorImageVO orphan : orphans) {
             if (deleteOne(orphan)) {
                 deleted++;
@@ -33,7 +34,9 @@ public class EditorImageCleanupServiceImpl implements EditorImageCleanupService 
                 failed++;
             }
         }
+
         log.info("에디터 이미지 정리: 대상 {}건, 삭제 {}건, 실패 {}건", orphans.size(), deleted, failed);
+
         return new EditorImageCleanupResponseVO(orphans.size(), deleted, failed);
     }
 
@@ -46,6 +49,7 @@ public class EditorImageCleanupServiceImpl implements EditorImageCleanupService 
             log.warn("정리 중 상품에 연결되어 행은 남김(파일은 이미 삭제됨): editorImageId={}", orphan.getEditorImageId());
             return false;
         }
+
         return true;
     }
 }

@@ -46,6 +46,7 @@ public enum ThumbnailTarget {
                 return target;
             }
         }
+
         throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "알 수 없는 썸네일 대상 종류입니다");
     }
 }

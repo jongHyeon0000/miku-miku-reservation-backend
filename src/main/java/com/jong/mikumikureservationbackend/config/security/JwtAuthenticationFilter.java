@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = resolveToken(request);
+
         if (token != null) {
             try {
                 Long userId = jwtProvider.getUserId(token);
@@ -41,9 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authentication = UsernamePasswordAuthenticationToken.authenticated(
                         principal, null, principal.getAuthorities());
+
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
+
                 context.setAuthentication(authentication);
                 SecurityContextHolder.setContext(context);
             } catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {
@@ -51,15 +54,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
             }
         }
+
         filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (header == null || !header.startsWith(BEARER_PREFIX)) {
             return null;
         }
+
         String token = header.substring(BEARER_PREFIX.length()).trim();
+
         return token.isEmpty() ? null : token;
     }
 }

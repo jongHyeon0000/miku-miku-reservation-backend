@@ -26,6 +26,7 @@ public class MailHtmlTemplateRenderer {
                 .replace("{{purposeLabel}}", purpose.getLabel())
                 .replace("{{code}}", code)
                 .replace("{{expireMinutes}}", String.valueOf(expireMinutes));
+
         return layout.replace("{{content}}", content);
     }
 

@@ -76,6 +76,7 @@ public class GenreCharacterGroupController {
             @Parameter(description = "수정할 장르 id", example = "1") @PathVariable Long genreCharacterGroupId,
             @Valid @RequestBody GenreCharacterGroupVO request) {
         genreCharacterGroupService.update(currentUser.getId(), genreCharacterGroupId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -91,6 +92,7 @@ public class GenreCharacterGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 장르 id", example = "1") @PathVariable Long genreCharacterGroupId) {
         genreCharacterGroupService.delete(currentUser.getId(), genreCharacterGroupId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

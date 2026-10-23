@@ -54,6 +54,7 @@ public class AuthController {
     @PostMapping("/signup/email-code")
     public ApiResponse<Void> sendSignupEmailCode(@Valid @RequestBody EmailVerificationVO request) {
         authService.sendSignupEmailCode(request.getEmail());
+
         return ApiResponse.ok("인증 코드를 메일로 보냈습니다.");
     }
 
@@ -94,6 +95,7 @@ public class AuthController {
     @PostMapping("/find-id/email-code")
     public ApiResponse<Void> sendFindIdEmailCode(@Valid @RequestBody EmailVerificationVO request) {
         authService.sendFindIdEmailCode(request.getEmail());
+
         return ApiResponse.ok("인증 코드를 메일로 보냈습니다.");
     }
 
@@ -133,6 +135,7 @@ public class AuthController {
     @PostMapping("/reset-password/email-code")
     public ApiResponse<Void> sendResetPasswordEmailCode(@Valid @RequestBody EmailVerificationVO request) {
         authService.sendResetPasswordEmailCode(request.getLoginId(), request.getEmail());
+
         return ApiResponse.ok("인증 코드를 메일로 보냈습니다.");
     }
 
@@ -154,6 +157,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordRequestVO request) {
         authService.resetPassword(request.getLoginId(), request.getEmail(), request.getNewPassword());
+
         return ApiResponse.ok("비밀번호가 변경되었습니다.");
     }
 
@@ -205,6 +209,7 @@ public class AuthController {
     @PatchMapping("/password")
     public ApiResponse<Void> changePassword(@Valid @RequestBody ChangePasswordRequestVO request) {
         authService.changePassword(currentUser.getId(), request.getCurrentPassword(), request.getNewPassword());
+
         return ApiResponse.ok("비밀번호가 변경되었습니다.");
     }
 
@@ -224,6 +229,7 @@ public class AuthController {
     @DeleteMapping("/me")
     public ApiResponse<Void> withdraw(@Valid @RequestBody WithdrawRequestVO request) {
         authService.withdraw(currentUser.getId(), request.getPassword());
+
         return ApiResponse.ok("탈퇴가 완료되었습니다.");
     }
 }

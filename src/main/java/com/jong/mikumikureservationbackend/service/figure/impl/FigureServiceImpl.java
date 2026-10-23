@@ -52,18 +52,25 @@ public class FigureServiceImpl implements FigureService {
     @Override
     public List<FigureResponseVO> getList(Long userId) {
         List<FigureResponseVO> figures = figureMapper.selectList(userId);
+
         if (figures.isEmpty()) {
             return figures;
         }
+
         List<Long> figureIds = new ArrayList<>();
+
         for (FigureResponseVO figure : figures) {
             figureIds.add(figure.getFigureId());
         }
+
         Map<Long, List<SeriesVO>> seriesByFigure = new HashMap<>();
+
         for (SeriesVO series : figureSeriesMapper.selectByFigureIds(userId, figureIds)) {
             seriesByFigure.computeIfAbsent(series.getFigureId(), key -> new ArrayList<>()).add(series);
         }
+
         Map<Long, List<GenreCharacterVO>> charactersByFigure = new HashMap<>();
+
         for (GenreCharacterVO character : figureCharacterMapper.selectByFigureIds(userId, figureIds)) {
             charactersByFigure.computeIfAbsent(character.getFigureId(), key -> new ArrayList<>()).add(character);
         }
@@ -71,30 +78,39 @@ public class FigureServiceImpl implements FigureService {
             figure.setSeries(seriesByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
             figure.setCharacters(charactersByFigure.getOrDefault(figure.getFigureId(), new ArrayList<>()));
         }
+
         return figures;
     }
 
     @Override
     public FigureResponseVO getDetail(Long userId, Long figureId) {
         FigureResponseVO figure = figureMapper.selectDetailById(userId, figureId);
+
         if (figure == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         List<Long> figureIds = Collections.singletonList(figureId);
+
         figure.setSeries(figureSeriesMapper.selectByFigureIds(userId, figureIds));
         figure.setCharacters(figureCharacterMapper.selectByFigureIds(userId, figureIds));
+
         return figure;
     }
 
     @Override
     public FigureResponseVO getListItem(Long userId, Long figureId) {
         FigureResponseVO figure = figureMapper.selectListById(userId, figureId);
+
         if (figure == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         List<Long> figureIds = Collections.singletonList(figureId);
+
         figure.setSeries(figureSeriesMapper.selectByFigureIds(userId, figureIds));
         figure.setCharacters(figureCharacterMapper.selectByFigureIds(userId, figureIds));
+
         return figure;
     }
 
@@ -102,11 +118,14 @@ public class FigureServiceImpl implements FigureService {
     @Transactional
     public FigureResponseVO create(Long userId, FigureSaveRequestVO request) {
         FigureStatus status = request.getStatus() == null ? FigureStatus.CART : request.getStatus();
+
         if (status != FigureStatus.CART && status != FigureStatus.UNPURCHASED) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "등록 시 상태는 CART 또는 UNPURCHASED만 가능합니다");
         }
+
         List<Long> seriesIds = distinct(request.getSeriesIds());
         List<Long> characterIds = distinct(request.getCharacterIds());
+
         checkCategories(userId, request.getFigureTypeId(), request.getShopId(), request.getMakerId(),
                 seriesIds, characterIds);
         editorImageService.checkNoBase64(request.getDescription());
@@ -114,10 +133,13 @@ public class FigureServiceImpl implements FigureService {
         request.setName(request.getName().trim());
         request.setDeliveryMonth(firstDayOfMonth(request.getDeliveryMonth()));
         figureMapper.insert(userId, status, request);
+
         Long figureId = figureMapper.selectLastInsertId();
+
         figureSeriesMapper.insertAll(userId, figureId, seriesIds);
         figureCharacterMapper.insertAll(userId, figureId, characterIds);
         linkEditorImages(userId, figureId, request.getDescription());
+
         return getListItem(userId, figureId);
     }
 
@@ -127,8 +149,10 @@ public class FigureServiceImpl implements FigureService {
         if (figureMapper.selectCurrentStatus(userId, figureId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         List<Long> seriesIds = distinct(request.getSeriesIds());
         List<Long> characterIds = distinct(request.getCharacterIds());
+
         checkCategories(userId, request.getFigureTypeId(), request.getShopId(), request.getMakerId(),
                 seriesIds, characterIds);
         editorImageService.checkNoBase64(request.getDescription());
@@ -142,6 +166,7 @@ public class FigureServiceImpl implements FigureService {
         figureCharacterMapper.insertAll(userId, figureId, characterIds);
         figureEditorImageMapper.deleteByFigure(userId, figureId);
         linkEditorImages(userId, figureId, request.getDescription());
+
         return getListItem(userId, figureId);
     }
 
@@ -151,6 +176,7 @@ public class FigureServiceImpl implements FigureService {
         if (figureMapper.delete(userId, figureId) == 0) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE, Collections.singletonList(figureId));
     }
 
@@ -158,18 +184,21 @@ public class FigureServiceImpl implements FigureService {
     @Transactional
     public void deleteAll(Long userId, List<Long> figureIds) {
         List<Long> distinctIds = distinct(figureIds);
+
         if (distinctIds.isEmpty()) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 상품 id가 필요합니다");
         }
         if (figureMapper.deleteByIds(userId, distinctIds) != distinctIds.size()) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE, distinctIds);
     }
 
     /* 설명 HTML에 쓰인 에디터 이미지를 이 상품에 연결한다. 업로드 경로가 정확히 같은 이미지만 연결하고 외부 주소는 무시한다 */
     private void linkEditorImages(Long userId, Long figureId, String description) {
         List<String> filePaths = editorImageService.extractFilePaths(description);
+
         if (!filePaths.isEmpty()) {
             figureEditorImageMapper.insertAllByFilePaths(userId, figureId, filePaths);
         }
@@ -199,6 +228,7 @@ public class FigureServiceImpl implements FigureService {
         if (figureIds == null) {
             return new ArrayList<>();
         }
+
         return new ArrayList<>(new LinkedHashSet<>(figureIds));
     }
 

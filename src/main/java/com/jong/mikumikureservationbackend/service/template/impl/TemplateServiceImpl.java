@@ -47,6 +47,7 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateVO template = find(templateId);
         int addCount;
         List<TemplateSkippedItemVO> skipped;
+
         switch (template.getTemplateType()) {
             case SHOP:
                 addCount = templateShopMapper.selectAddCount(userId, templateId);
@@ -71,6 +72,7 @@ public class TemplateServiceImpl implements TemplateService {
             default:
                 throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
+
         return new TemplatePreviewResponseVO(templateId, template.getName(), addCount, skipped.size(), groupSkipped(skipped));
     }
 
@@ -78,6 +80,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Transactional
     public TemplateImportResponseVO importTemplate(Long userId, Long templateId) {
         TemplateVO template = find(templateId);
+
         switch (template.getTemplateType()) {
             case SHOP:
                 return importShop(userId, templateId);
@@ -114,14 +117,12 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateImportResponseVO importFigureType(Long userId, Long templateId) {
         long maxGroupId = templateFigureTypeMapper.selectMaxGroupId(userId);
+
         templateFigureTypeMapper.insertGroups(userId, templateId);
-
         templateFigureTypeMapper.insertDefaultItems(userId, templateId, CategoryConstant.DEFAULT_NAME);
-
         templateFigureTypeMapper.insertGroupThumbnails(userId, templateId, maxGroupId);
 
         int skippedCount = templateFigureTypeMapper.selectSkipped(userId, templateId).size();
-
         long maxItemId = templateFigureTypeMapper.selectMaxItemId(userId);
         int addedCount = templateFigureTypeMapper.insertItems(userId, templateId);
 
@@ -132,14 +133,12 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateImportResponseVO importSeries(Long userId, Long templateId) {
         long maxGroupId = templateSeriesMapper.selectMaxGroupId(userId);
+
         templateSeriesMapper.insertGroups(userId, templateId);
-
         templateSeriesMapper.insertDefaultItems(userId, templateId, CategoryConstant.DEFAULT_NAME);
-
         templateSeriesMapper.insertGroupThumbnails(userId, templateId, maxGroupId);
 
         int skippedCount = templateSeriesMapper.selectSkipped(userId, templateId).size();
-
         long maxItemId = templateSeriesMapper.selectMaxItemId(userId);
         int addedCount = templateSeriesMapper.insertItems(userId, templateId);
 
@@ -150,14 +149,12 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateImportResponseVO importGenreCharacter(Long userId, Long templateId) {
         long maxGroupId = templateGenreCharacterMapper.selectMaxGroupId(userId);
+
         templateGenreCharacterMapper.insertGroups(userId, templateId);
-
         templateGenreCharacterMapper.insertDefaultItems(userId, templateId, CategoryConstant.DEFAULT_NAME);
-
         templateGenreCharacterMapper.insertGroupThumbnails(userId, templateId, maxGroupId);
 
         int skippedCount = templateGenreCharacterMapper.selectSkipped(userId, templateId).size();
-
         long maxItemId = templateGenreCharacterMapper.selectMaxItemId(userId);
         int addedCount = templateGenreCharacterMapper.insertItems(userId, templateId);
 
@@ -168,7 +165,6 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateImportResponseVO importMaker(Long userId, Long templateId) {
         int skippedCount = templateMakerMapper.selectSkipped(userId, templateId).size();
-
         long maxItemId = templateMakerMapper.selectMaxItemId(userId);
         int addedCount = templateMakerMapper.insertItems(userId, templateId);
 
@@ -179,27 +175,35 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateVO find(Long templateId) {
         TemplateVO template = templateMapper.selectById(templateId);
+
         if (template == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         return template;
     }
 
     /* 제외 항목을 상위 그룹 이름별로 묶는다 (조회 순서 유지, 제조사는 상위가 없어 groupName이 null 하나로 묶인다) */
     private List<TemplateSkippedGroupVO> groupSkipped(List<TemplateSkippedItemVO> skipped) {
         Map<String, List<String>> grouped = new LinkedHashMap<>();
+
         for (TemplateSkippedItemVO item : skipped) {
             List<String> names = grouped.get(item.getGroupName());
+
             if (names == null) {
                 names = new ArrayList<>();
                 grouped.put(item.getGroupName(), names);
             }
+
             names.add(item.getName());
         }
+
         List<TemplateSkippedGroupVO> result = new ArrayList<>();
+
         for (Map.Entry<String, List<String>> entry : grouped.entrySet()) {
             result.add(new TemplateSkippedGroupVO(entry.getKey(), entry.getValue()));
         }
+
         return result;
     }
 }

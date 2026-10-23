@@ -55,21 +55,27 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
     public ThumbnailUrlResponseVO upload(Long userId, ThumbnailTarget target, Long targetId, MultipartFile file) {
         checkTargetExists(userId, target, targetId);
         imageFileStore.validate(file);
+
         String originalName = imageFileStore.originalNameOf(file);
         String extension = imageFileStore.extensionOf(originalName);
 
         // 이미 썸네일이 있으면 행을 지우고 새로 넣는다(대상당 1개). 옛 파일은 새 파일 저장에 성공한 뒤 지운다
         ThumbnailImageVO old = thumbnailImageMapper.selectByTarget(userId, target, targetId);
+
         if (old != null) {
             thumbnailImageMapper.deleteByTarget(userId, target, targetId);
         }
+
         String filePath = buildFilePath(userId, target, extension);
+
         thumbnailImageMapper.insert(userId, target, targetId, filePath, originalName, file.getSize());
 
         imageFileStore.save(file, filePath);   // 실패하면 예외로 DB 변경도 롤백된다
+
         if (old != null) {
             deleteOwnFile(userId, old.getFilePath());
         }
+
         return new ThumbnailUrlResponseVO(UploadConstant.URL_PREFIX + filePath);
     }
 
@@ -77,7 +83,9 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
     @Transactional
     public void delete(Long userId, ThumbnailTarget target, Long targetId) {
         checkTargetExists(userId, target, targetId);
+
         ThumbnailImageVO old = thumbnailImageMapper.selectByTarget(userId, target, targetId);
+
         if (old != null) {
             thumbnailImageMapper.deleteByTarget(userId, target, targetId);
             deleteOwnFile(userId, old.getFilePath());
@@ -90,11 +98,15 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
         if (targetIds == null || targetIds.isEmpty()) {
             return;
         }
+
         List<String> filePaths = thumbnailImageMapper.selectFilePathsByTargets(userId, target, targetIds);
+
         if (filePaths.isEmpty()) {
             return;
         }
+
         thumbnailImageMapper.deleteByTargets(userId, target, targetIds);
+
         for (String filePath : filePaths) {
             deleteOwnFile(userId, filePath);
         }
@@ -110,6 +122,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
     /* 종류에 맞는 테이블에서 대상이 현재 사용자의 것인지 확인한다. 없거나 남의 것이면 404 */
     private void checkTargetExists(Long userId, ThumbnailTarget target, Long targetId) {
         boolean exists;
+
         switch (target) {
             case FIGURE:
                 exists = figureMapper.selectCurrentStatus(userId, targetId) != null;
@@ -157,6 +170,7 @@ public class ThumbnailImageServiceImpl implements ThumbnailImageService {
     /* 저장 경로는 서버가 만든다: {userId}/thumbnail-image/{대상 종류}/{yyyy}/{MM}/{UUID}.{확장자} (원본 파일명은 경로에 쓰지 않는다) */
     private String buildFilePath(Long userId, ThumbnailTarget target, String extension) {
         LocalDate today = LocalDate.now();
+
         return String.format("%d/%s/%s/%d/%02d/%s.%s", userId, UploadConstant.THUMBNAIL_IMAGE_DIR, target.getUrlValue(),
                 today.getYear(), today.getMonthValue(), UUID.randomUUID(), extension);
     }

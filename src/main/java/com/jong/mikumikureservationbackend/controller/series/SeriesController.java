@@ -77,6 +77,7 @@ public class SeriesController {
             @Parameter(description = "수정할 시리즈 id", example = "1") @PathVariable Long seriesId,
             @Valid @RequestBody SeriesVO request) {
         seriesService.update(currentUser.getId(), seriesId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -92,6 +93,7 @@ public class SeriesController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 시리즈 id", example = "1") @PathVariable Long seriesId) {
         seriesService.delete(currentUser.getId(), seriesId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

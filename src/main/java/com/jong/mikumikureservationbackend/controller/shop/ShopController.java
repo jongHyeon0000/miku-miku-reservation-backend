@@ -77,6 +77,7 @@ public class ShopController {
             @Parameter(description = "수정할 판매처 스토어 id", example = "1") @PathVariable Long shopId,
             @Valid @RequestBody ShopVO request) {
         shopService.update(currentUser.getId(), shopId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -92,6 +93,7 @@ public class ShopController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 판매처 스토어 id", example = "1") @PathVariable Long shopId) {
         shopService.delete(currentUser.getId(), shopId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

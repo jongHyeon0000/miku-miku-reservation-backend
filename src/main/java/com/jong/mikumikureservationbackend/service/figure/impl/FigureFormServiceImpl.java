@@ -25,11 +25,13 @@ public class FigureFormServiceImpl implements FigureFormService {
     @Override
     public FigureFormOptionsResponseVO getOptions(Long userId) {
         FigureFormOptionsResponseVO options = new FigureFormOptionsResponseVO();
+
         options.setShops(shopGroupService.getTree(userId));
         options.setTypes(figureTypeGroupService.getTree(userId));
         options.setSeries(seriesGroupService.getTree(userId));
         options.setGenres(genreCharacterGroupService.getTree(userId));
         options.setMakers(makerService.getAll(userId));
+
         return options;
     }
 }

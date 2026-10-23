@@ -33,13 +33,17 @@ public class FigureStatusServiceImpl implements FigureStatusService {
     @Transactional
     public FigureResponseVO change(Long userId, Long figureId, FigureStatusRequestVO request) {
         FigureVO current = figureMapper.selectCurrentStatus(userId, figureId);
+
         if (current == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         FigureVO param = buildParam(userId, current, request.getStatus(), request.getPaymentType(),
                 request.getDepositAmount(), request.getDepositPaidAt(), request.getBalanceDueDate(),
                 request.getPaidAt(), request.getDeliveredAt());
+
         figureMapper.updateStatus(param);
+
         return figureService.getListItem(userId, figureId);
     }
 
@@ -52,17 +56,20 @@ public class FigureStatusServiceImpl implements FigureStatusService {
         if (request.getStatus() == FigureStatus.RESERVED) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "예약금 결제는 일괄 변경할 수 없습니다");
         }
-        List<Long> figureIds = new ArrayList<>(new LinkedHashSet<>(request.getFigureIds()));
 
+        List<Long> figureIds = new ArrayList<>(new LinkedHashSet<>(request.getFigureIds()));
         Map<Long, FigureVO> currentById = new HashMap<>();
+
         for (FigureVO current : figureMapper.selectCurrentStatusByIds(userId, figureIds)) {
             currentById.put(current.getFigureId(), current);
         }
 
         List<FigureVO> params = new ArrayList<>();
         List<Long> problemIds = new ArrayList<>();
+
         for (Long figureId : figureIds) {
             FigureVO current = currentById.get(figureId);
+
             if (current == null) {
                 problemIds.add(figureId);
                 continue;
@@ -78,10 +85,10 @@ public class FigureStatusServiceImpl implements FigureStatusService {
             throw new BusinessException(GlobalExceptionCode.INVALID_STATUS_TRANSITION,
                     "변경할 수 없는 상품이 있어 아무것도 바꾸지 않았습니다. 문제 figureId: " + problemIds);
         }
-
         for (FigureVO param : params) {
             figureMapper.updateStatus(param);
         }
+
         return figureIds;
     }
 
@@ -98,6 +105,7 @@ public class FigureStatusServiceImpl implements FigureStatusService {
                                                LocalDate depositPaidAt, LocalDate balanceDueDate,
                                                LocalDate paidAt, LocalDate deliveredAt) {
         FigureStatus from = current.getStatus();
+
         if (!from.canMoveTo(next)) {
             throw new BusinessException(GlobalExceptionCode.INVALID_STATUS_TRANSITION,
                     from + "에서 " + next + "(으)로는 변경할 수 없습니다");
@@ -105,15 +113,18 @@ public class FigureStatusServiceImpl implements FigureStatusService {
 
         LocalDate today = LocalDate.now();
         FigureVO param = new FigureVO();
+
         param.setUserId(userId);
         param.setFigureId(current.getFigureId());
         param.setStatus(next);
 
         if (next == FigureStatus.RESERVED) {
             requirePaymentType(paymentType, PaymentType.DEPOSIT);
+
             if (depositAmount == null) {
                 throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "예약금(depositAmount)이 필요합니다");
             }
+
             param.setPaymentType(paymentType);
             param.setDepositAmount(depositAmount);
             param.setDepositPaidAt(depositPaidAt == null ? today : depositPaidAt);
@@ -125,13 +136,16 @@ public class FigureStatusServiceImpl implements FigureStatusService {
             } else {
                 requireNoPaymentType(paymentType);
             }
+
             param.setPaidAt(paidAt == null ? today : paidAt);
         } else {
             requireNoPaymentType(paymentType);
+
             if (next == FigureStatus.DELIVERED) {
                 param.setDeliveredAt(deliveredAt == null ? today : deliveredAt);
             }
         }
+
         return param;
     }
 

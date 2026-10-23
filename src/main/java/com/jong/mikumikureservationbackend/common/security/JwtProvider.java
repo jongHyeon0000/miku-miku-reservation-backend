@@ -33,6 +33,7 @@ public class JwtProvider {
 
     public String createToken(Long userId) {
         Date now = new Date();
+
         return Jwts.builder()
                 .issuer(ISSUER)
                 .subject(String.valueOf(userId))
@@ -44,6 +45,7 @@ public class JwtProvider {
 
     public Long getUserId(String token) {
         Claims claims = jwtParser.parseSignedClaims(token).getPayload();
+
         return Long.valueOf(claims.getSubject());
     }
 }

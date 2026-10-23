@@ -76,6 +76,7 @@ public class ShopGroupController {
             @Parameter(description = "수정할 판매처 채널 id", example = "1") @PathVariable Long shopGroupId,
             @Valid @RequestBody ShopGroupVO request) {
         shopGroupService.update(currentUser.getId(), shopGroupId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -91,6 +92,7 @@ public class ShopGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 판매처 채널 id", example = "1") @PathVariable Long shopGroupId) {
         shopGroupService.delete(currentUser.getId(), shopGroupId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

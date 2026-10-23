@@ -34,18 +34,23 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     public List<GenreCharacterGroupVO> getTree(Long userId) {
         List<GenreCharacterGroupVO> parents = genreCharacterGroupMapper.selectAll(userId);
         List<GenreCharacterVO> children = genreCharacterMapper.selectAll(userId);
+
         // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
         parents.sort(Comparator.comparing(p -> CategoryConstant.DEFAULT_NAME.equals(p.getName())));
         children.sort(Comparator.comparing(c -> CategoryConstant.DEFAULT_NAME.equals(c.getName())));
+
         for (GenreCharacterGroupVO parent : parents) {
             List<GenreCharacterVO> own = new ArrayList<>();
+
             for (GenreCharacterVO child : children) {
                 if (parent.getId().equals(child.getGroupId())) {
                     own.add(child);
                 }
             }
+
             parent.setChildren(own);
         }
+
         return parents;
     }
 
@@ -53,17 +58,22 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     @Transactional
     public GenreCharacterGroupVO create(Long userId, GenreCharacterGroupVO vo) {
         String trimmed = vo.getName().trim();
+
         try {
             genreCharacterGroupMapper.insert(userId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
+
         GenreCharacterGroupVO parent = genreCharacterGroupMapper.selectByName(userId, trimmed);
 
         genreCharacterMapper.insert(userId, parent.getId(), CategoryConstant.DEFAULT_NAME, null);
+
         List<GenreCharacterVO> children = new ArrayList<>();
+
         children.add(genreCharacterMapper.selectByParentAndName(userId, parent.getId(), CategoryConstant.DEFAULT_NAME));
         parent.setChildren(children);
+
         return parent;
     }
 
@@ -71,6 +81,7 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     @Transactional
     public void update(Long userId, Long genreCharacterGroupId, GenreCharacterGroupVO vo) {
         GenreCharacterGroupVO parent = find(userId, genreCharacterGroupId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())
                 && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
@@ -86,16 +97,22 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     @Transactional
     public void delete(Long userId, Long genreCharacterGroupId) {
         GenreCharacterGroupVO parent = find(userId, genreCharacterGroupId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(parent.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
+
         Long fallbackId = genreCharacterGroupMapper.selectDefaultChildId(userId, CategoryConstant.DEFAULT_NAME);
+
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
+
         genreCharacterGroupMapper.moveInsertFallback(userId, genreCharacterGroupId, fallbackId);
         genreCharacterGroupMapper.moveDeleteLinks(userId, genreCharacterGroupId);
+
         List<Long> childIds = genreCharacterMapper.selectIdsByParent(userId, genreCharacterGroupId);   // 상위를 지우면 하위도 CASCADE로 지워지므로 미리 모아 둔다
+
         genreCharacterGroupMapper.delete(userId, genreCharacterGroupId);
         thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.GENRE_CHARACTER_GROUP, Collections.singletonList(genreCharacterGroupId));
         thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.GENRE_CHARACTER, childIds);
@@ -104,14 +121,17 @@ public class GenreCharacterGroupServiceImpl implements GenreCharacterGroupServic
     @Override
     public UsageResponseVO getUsage(Long userId, Long genreCharacterGroupId) {
         find(userId, genreCharacterGroupId);
+
         return new UsageResponseVO(genreCharacterGroupMapper.countUsage(userId, genreCharacterGroupId));
     }
 
     private GenreCharacterGroupVO find(Long userId, Long genreCharacterGroupId) {
         GenreCharacterGroupVO parent = genreCharacterGroupMapper.selectById(userId, genreCharacterGroupId);
+
         if (parent == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         return parent;
     }
 }

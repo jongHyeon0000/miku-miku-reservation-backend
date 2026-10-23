@@ -31,9 +31,11 @@ public class MailServiceImpl implements MailService {
     public void sendVerificationCode(String to, EmailVerificationPurpose purpose, String code, int expireMinutes) {
         String subject = "[" + mailProperties.getFromName() + "] " + purpose.getLabel() + " 인증 코드";
         String html = mailHtmlTemplateRenderer.renderVerification(purpose, code, expireMinutes);
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
             helper.setFrom(mailProperties.getFromAddress(), mailProperties.getFromName());
             helper.setTo(to);
             helper.setSubject(subject);

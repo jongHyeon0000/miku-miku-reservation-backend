@@ -31,8 +31,10 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Override
     public List<FigureTypeVO> getAll(Long userId) {
         List<FigureTypeVO> list = figureTypeMapper.selectAll(userId);
+
         // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
         list.sort(Comparator.comparing(v -> CategoryConstant.DEFAULT_NAME.equals(v.getName())));
+
         return list;
     }
 
@@ -40,18 +42,22 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Transactional
     public FigureTypeVO create(Long userId, FigureTypeVO vo) {
         Long figureTypeGroupId = vo.getGroupId();
+
         if (figureTypeGroupId == null) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "figureTypeGroupId: 필수 값입니다");
         }
         if (figureTypeGroupMapper.selectById(userId, figureTypeGroupId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         String trimmed = vo.getName().trim();
+
         try {
             figureTypeMapper.insert(userId, figureTypeGroupId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
+
         return figureTypeMapper.selectByParentAndName(userId, figureTypeGroupId, trimmed);
     }
 
@@ -59,6 +65,7 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Transactional
     public void update(Long userId, Long figureTypeId, FigureTypeVO vo) {
         FigureTypeVO child = find(userId, figureTypeId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())
                 && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
@@ -74,16 +81,20 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Transactional
     public void delete(Long userId, Long figureTypeId) {
         FigureTypeVO child = find(userId, figureTypeId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         if (figureTypeMapper.countByParent(userId, child.getGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
+
         Long fallbackId = figureTypeMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
+
         figureTypeMapper.moveUsage(userId, figureTypeId, fallbackId);
         figureTypeMapper.delete(userId, figureTypeId);
         thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE_TYPE, Collections.singletonList(figureTypeId));
@@ -92,14 +103,17 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     @Override
     public UsageResponseVO getUsage(Long userId, Long figureTypeId) {
         find(userId, figureTypeId);
+
         return new UsageResponseVO(figureTypeMapper.countUsage(userId, figureTypeId));
     }
 
     private FigureTypeVO find(Long userId, Long figureTypeId) {
         FigureTypeVO child = figureTypeMapper.selectById(userId, figureTypeId);
+
         if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         return child;
     }
 }

@@ -42,6 +42,7 @@ public class UploadProperties {
                 extensions.stream()
                         .map(UploadProperties::normalize)
                         .collect(Collectors.toList())
+
         );
     }
 

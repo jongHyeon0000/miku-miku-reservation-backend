@@ -43,7 +43,9 @@ public class ImageFileStore {
         if (file == null || file.isEmpty()) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "업로드할 파일이 비어 있습니다");
         }
+
         String extension = extensionOf(originalNameOf(file));
+
         if (!uploadProperties.isAllowedExtension(extension)) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST,
                     "허용하지 않는 확장자입니다 (허용: " + uploadProperties.getAllowedExtensions() + ")");
@@ -59,26 +61,31 @@ public class ImageFileStore {
     /* 클라이언트가 보낸 파일명에서 경로를 떼고 255자까지만 남긴다. DB에만 남기고 저장 경로에는 쓰지 않는다 */
     public String originalNameOf(MultipartFile file) {
         String name = StringUtils.getFilename(file.getOriginalFilename());
+
         if (name == null) {
             name = "";
         }
+
         return name.length() > ORIGINAL_NAME_MAX ? name.substring(0, ORIGINAL_NAME_MAX) : name;
     }
 
     /* 소문자 확장자. 없으면 null */
     public String extensionOf(String fileName) {
         String extension = StringUtils.getFilenameExtension(fileName);
+
         return extension == null ? null : extension.toLowerCase(Locale.ROOT);
     }
 
     /* 파일을 업로드 폴더의 filePath에 저장한다(폴더는 만든다). 실패하면 반쯤 쓴 파일을 지우고 500 */
     public void save(MultipartFile file, String filePath) {
         Path target = resolve(filePath);
+
         if (target == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
         try {
             Files.createDirectories(target.getParent());
+
             try (InputStream in = file.getInputStream()) {
                 Files.copy(in, target);
             }
@@ -95,6 +102,7 @@ public class ImageFileStore {
      */
     public boolean delete(String filePath) {
         Path target = resolve(filePath);
+
         if (target == null) {
             log.warn("업로드 폴더 밖 경로라 지우지 않음: {}", filePath);
             return false;
@@ -112,6 +120,7 @@ public class ImageFileStore {
     public boolean deleteDirectory(String dirPath) {
         Path target = resolve(dirPath);
         Path root = uploadProperties.getDir().toAbsolutePath().normalize();
+
         if (target == null || target.equals(root)) {
             log.warn("업로드 폴더 밖이거나 업로드 폴더 자체라 지우지 않음: {}", dirPath);
             return false;
@@ -122,9 +131,11 @@ public class ImageFileStore {
         try (Stream<Path> paths = Files.walk(target)) {
             // 깊은 경로부터 지운다
             List<Path> deleteOrder = paths.sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+
             for (Path path : deleteOrder) {
                 Files.deleteIfExists(path);
             }
+
             return true;
         } catch (IOException e) {
             log.warn("업로드 폴더 삭제 실패: {}", target, e);
@@ -136,6 +147,7 @@ public class ImageFileStore {
     private Path resolve(String filePath) {
         Path root = uploadProperties.getDir().toAbsolutePath().normalize();
         Path target = root.resolve(filePath).normalize();
+
         return target.startsWith(root) ? target : null;
     }
 
@@ -170,6 +182,7 @@ public class ImageFileStore {
 
     private boolean startsWith(byte[] header, int offset, String ascii) {
         byte[] expected = ascii.getBytes(StandardCharsets.US_ASCII);
+
         if (header.length < offset + expected.length) {
             return false;
         }
@@ -178,6 +191,7 @@ public class ImageFileStore {
                 return false;
             }
         }
+
         return true;
     }
 }

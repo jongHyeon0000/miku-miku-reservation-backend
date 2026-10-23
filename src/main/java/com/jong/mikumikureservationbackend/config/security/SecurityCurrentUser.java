@@ -14,9 +14,11 @@ public class SecurityCurrentUser implements CurrentUser {
     @Override
     public Long getId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthUser)) {
             throw new BusinessException(GlobalExceptionCode.UNAUTHORIZED);
         }
+
         return ((AuthUser) authentication.getPrincipal()).getUserId();
     }
 }

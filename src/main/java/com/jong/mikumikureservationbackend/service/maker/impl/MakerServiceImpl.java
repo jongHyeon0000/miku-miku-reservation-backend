@@ -29,8 +29,10 @@ public class MakerServiceImpl implements MakerService {
     @Override
     public List<MakerVO> getAll(Long userId) {
         List<MakerVO> list = makerMapper.selectAll(userId);
+
         // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
         list.sort(Comparator.comparing(v -> CategoryConstant.DEFAULT_NAME.equals(v.getName())));
+
         return list;
     }
 
@@ -38,11 +40,13 @@ public class MakerServiceImpl implements MakerService {
     @Transactional
     public MakerVO create(Long userId, MakerVO vo) {
         String trimmed = vo.getName().trim();
+
         try {
             makerMapper.insert(userId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
+
         return makerMapper.selectByName(userId, trimmed);
     }
 
@@ -50,6 +54,7 @@ public class MakerServiceImpl implements MakerService {
     @Transactional
     public void update(Long userId, Long makerId, MakerVO vo) {
         MakerVO maker = find(userId, makerId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(maker.getName())
                 && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
@@ -65,13 +70,17 @@ public class MakerServiceImpl implements MakerService {
     @Transactional
     public void delete(Long userId, Long makerId) {
         MakerVO maker = find(userId, makerId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(maker.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
+
         Long fallbackId = makerMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
+
         makerMapper.moveUsage(userId, makerId, fallbackId);
         makerMapper.delete(userId, makerId);
         thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.MAKER, Collections.singletonList(makerId));
@@ -80,14 +89,17 @@ public class MakerServiceImpl implements MakerService {
     @Override
     public UsageResponseVO getUsage(Long userId, Long makerId) {
         find(userId, makerId);
+
         return new UsageResponseVO(makerMapper.countUsage(userId, makerId));
     }
 
     private MakerVO find(Long userId, Long makerId) {
         MakerVO maker = makerMapper.selectById(userId, makerId);
+
         if (maker == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         return maker;
     }
 }

@@ -31,11 +31,13 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Override
     public void sendCode(String email, EmailVerificationPurpose purpose) {
         String prefix = prefix(email, purpose);
+
         if (redisService.hasKey(prefix + ":cooldown")) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "인증 코드는 60초 뒤에 다시 받을 수 있습니다");
         }
 
         String code = String.format("%06d", secureRandom.nextInt(1000000));
+
         redisService.set(prefix + ":code", passwordEncoder.encode(code), CODE_TTL);
         redisService.delete(prefix + ":attempt");
         redisService.delete(prefix + ":verified");
@@ -59,17 +61,22 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         if (code == null || code.trim().isEmpty()) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "code: 인증 코드를 입력해 주세요");
         }
+
         String prefix = prefix(email, purpose);
+
         if (redisService.hasKey(prefix + ":verified")) {
             return;
         }
 
         String codeHash = redisService.get(prefix + ":code");
+
         if (codeHash == null) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "인증 코드를 받지 않았거나 만료되었습니다. 다시 받아 주세요");
         }
+
         String attemptValue = redisService.get(prefix + ":attempt");
         int attempts = attemptValue == null ? 0 : Integer.parseInt(attemptValue);
+
         if (attempts >= MAX_ATTEMPTS) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "확인 횟수를 초과했습니다. 인증 코드를 다시 받아 주세요");
         }
@@ -80,6 +87,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST,
                     "인증 코드가 일치하지 않습니다 (남은 횟수 " + (MAX_ATTEMPTS - attempts - 1) + "회)");
         }
+
         redisService.set(prefix + ":verified", "1", VERIFIED_TTL);
         redisService.delete(prefix + ":code");
         redisService.delete(prefix + ":attempt");
@@ -88,9 +96,11 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Override
     public void consume(String email, EmailVerificationPurpose purpose) {
         String key = prefix(email, purpose) + ":verified";
+
         if (!redisService.hasKey(key)) {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "이메일 인증을 완료해 주세요");
         }
+
         redisService.delete(key);
     }
 

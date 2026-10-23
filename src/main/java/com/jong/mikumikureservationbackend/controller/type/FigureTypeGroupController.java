@@ -76,6 +76,7 @@ public class FigureTypeGroupController {
             @Parameter(description = "수정할 형태 id", example = "1") @PathVariable Long figureTypeGroupId,
             @Valid @RequestBody FigureTypeGroupVO request) {
         figureTypeGroupService.update(currentUser.getId(), figureTypeGroupId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -91,6 +92,7 @@ public class FigureTypeGroupController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 형태 id", example = "1") @PathVariable Long figureTypeGroupId) {
         figureTypeGroupService.delete(currentUser.getId(), figureTypeGroupId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

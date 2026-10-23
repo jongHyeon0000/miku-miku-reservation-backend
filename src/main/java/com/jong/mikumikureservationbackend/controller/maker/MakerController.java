@@ -76,6 +76,7 @@ public class MakerController {
             @Parameter(description = "수정할 제조사 id", example = "1") @PathVariable Long makerId,
             @Valid @RequestBody MakerVO request) {
         makerService.update(currentUser.getId(), makerId, request);
+
         return ApiResponse.ok("수정이 완료되었습니다.");
     }
 
@@ -91,6 +92,7 @@ public class MakerController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 제조사 id", example = "1") @PathVariable Long makerId) {
         makerService.delete(currentUser.getId(), makerId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 

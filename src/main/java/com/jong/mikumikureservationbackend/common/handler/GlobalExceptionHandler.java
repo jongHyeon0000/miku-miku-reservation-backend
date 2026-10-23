@@ -35,6 +35,7 @@ public class GlobalExceptionHandler {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
+
         return build(GlobalExceptionCode.VALIDATION_FAILED, message);
     }
 
@@ -43,6 +44,7 @@ public class GlobalExceptionHandler {
         String message = e.getConstraintViolations().stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining(", "));
+
         return build(GlobalExceptionCode.VALIDATION_FAILED, message);
     }
 
@@ -89,9 +91,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
         if (e instanceof ErrorResponse) {
             GlobalExceptionCode errorCode = fromStatus(((ErrorResponse) e).getStatusCode().value());
+
             return build(errorCode, errorCode.getDefaultMessage());
         }
+
         log.error("처리되지 않은 예외", e);
+
         return build(GlobalExceptionCode.INTERNAL_ERROR, GlobalExceptionCode.INTERNAL_ERROR.getDefaultMessage());
     }
 
@@ -108,6 +113,7 @@ public class GlobalExceptionHandler {
         if (status >= 400 && status < 500) {
             return GlobalExceptionCode.BAD_REQUEST;
         }
+
         return GlobalExceptionCode.INTERNAL_ERROR;
     }
 

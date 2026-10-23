@@ -167,6 +167,7 @@ public class FigureController {
     public ApiResponse<Void> delete(
             @Parameter(description = "삭제할 상품 id", example = "12") @PathVariable Long figureId) {
         figureService.delete(currentUser.getId(), figureId);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 
@@ -183,6 +184,7 @@ public class FigureController {
             @Parameter(description = "삭제할 상품 id 목록 (쉼표로 구분)", example = "1,2,3", required = true)
             @RequestParam List<Long> figureIds) {
         figureService.deleteAll(currentUser.getId(), figureIds);
+
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
 }

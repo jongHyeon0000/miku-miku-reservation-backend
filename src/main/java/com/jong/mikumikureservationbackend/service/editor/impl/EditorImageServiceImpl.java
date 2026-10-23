@@ -35,20 +35,26 @@ public class EditorImageServiceImpl implements EditorImageService {
     @Transactional
     public EditorImageVO upload(Long userId, MultipartFile file) {
         imageFileStore.validate(file);
+
         String originalName = imageFileStore.originalNameOf(file);
         String extension = imageFileStore.extensionOf(originalName);
 
         String filePath = buildFilePath(userId, extension);
+
         editorImageMapper.insert(userId, filePath, originalName, file.getSize());
+
         Long editorImageId = editorImageMapper.selectLastInsertId();
 
         imageFileStore.save(file, filePath);   // 실패하면 예외로 DB 행도 롤백된다
+
         EditorImageVO result = new EditorImageVO();
+
         result.setEditorImageId(editorImageId);
         result.setFilePath(filePath);
         result.setOriginalName(originalName);
         result.setFileSize(file.getSize());
         result.setUrl(UploadConstant.URL_PREFIX + filePath);
+
         return result;
     }
 
@@ -65,12 +71,15 @@ public class EditorImageServiceImpl implements EditorImageService {
     @Override
     public List<String> extractFilePaths(String html) {
         Set<String> filePaths = new LinkedHashSet<>();
+
         for (Element img : parse(html).select("img[src]")) {
             String src = img.attr("src").trim();
+
             if (src.startsWith(UploadConstant.URL_PREFIX)) {
                 filePaths.add(src.substring(UploadConstant.URL_PREFIX.length()));
             }
         }
+
         return new ArrayList<>(filePaths);
     }
 
@@ -81,6 +90,7 @@ public class EditorImageServiceImpl implements EditorImageService {
     /* 저장 경로는 서버가 만든다: {userId}/editor-image/{yyyy}/{MM}/{UUID}.{확장자} (원본 파일명은 경로에 쓰지 않는다) */
     private String buildFilePath(Long userId, String extension) {
         LocalDate today = LocalDate.now();
+
         return String.format("%d/%s/%d/%02d/%s.%s", userId, UploadConstant.EDITOR_IMAGE_DIR, today.getYear(),
                 today.getMonthValue(), UUID.randomUUID(), extension);
     }

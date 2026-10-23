@@ -40,6 +40,7 @@ public class EmailVerificationController {
     @PostMapping("/verify")
     public ApiResponse<Void> verify(@Valid @RequestBody EmailVerificationVO request) {
         emailVerificationService.verify(request.getEmail(), request.getPurpose(), request.getCode());
+
         return ApiResponse.ok("이메일 인증이 완료되었습니다.");
     }
 }

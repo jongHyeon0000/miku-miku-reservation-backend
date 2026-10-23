@@ -32,6 +32,7 @@ public class SwaggerSecurityConfig {
                 .roles("DOCS")
                 .build();
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(new InMemoryUserDetailsManager(docsUser));
+
         provider.setPasswordEncoder(passwordEncoder);
 
         http

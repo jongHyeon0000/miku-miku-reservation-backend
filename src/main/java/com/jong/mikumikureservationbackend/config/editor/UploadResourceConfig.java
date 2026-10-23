@@ -17,9 +17,11 @@ public class UploadResourceConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String location = uploadProperties.getDir().toAbsolutePath().normalize().toUri().toString();
+
         if (!location.endsWith("/")) {
             location = location + "/";
         }
+
         registry.addResourceHandler(UploadConstant.URL_PREFIX + "**").addResourceLocations(location);
     }
 }

@@ -19,17 +19,21 @@ public class AuthUserDetailsService implements UserDetailsService {
     @Override
     public AuthUser loadUserByUsername(String loginId) throws UsernameNotFoundException {
         UserVO user = userMapper.selectByLoginId(loginId);
+
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다");
         }
+
         return new AuthUser(user.getUserId(), user.getLoginId(), user.getPasswordHash());
     }
 
     public AuthUser loadUserById(Long userId) throws UsernameNotFoundException {
         UserVO user = userMapper.selectById(userId);
+
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다");
         }
+
         return new AuthUser(user.getUserId(), user.getLoginId(), null);
     }
 }

@@ -31,8 +31,10 @@ public class SeriesServiceImpl implements SeriesService {
     @Override
     public List<SeriesVO> getAll(Long userId) {
         List<SeriesVO> list = seriesMapper.selectAll(userId);
+
         // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
         list.sort(Comparator.comparing(v -> CategoryConstant.DEFAULT_NAME.equals(v.getName())));
+
         return list;
     }
 
@@ -40,18 +42,22 @@ public class SeriesServiceImpl implements SeriesService {
     @Transactional
     public SeriesVO create(Long userId, SeriesVO vo) {
         Long seriesGroupId = vo.getGroupId();
+
         if (seriesGroupId == null) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "seriesGroupId: 필수 값입니다");
         }
         if (seriesGroupMapper.selectById(userId, seriesGroupId) == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         String trimmed = vo.getName().trim();
+
         try {
             seriesMapper.insert(userId, seriesGroupId, trimmed, vo.getDescription());
         } catch (DuplicateKeyException e) {
             throw new BusinessException(GlobalExceptionCode.DUPLICATE_NAME);
         }
+
         return seriesMapper.selectByParentAndName(userId, seriesGroupId, trimmed);
     }
 
@@ -59,6 +65,7 @@ public class SeriesServiceImpl implements SeriesService {
     @Transactional
     public void update(Long userId, Long seriesId, SeriesVO vo) {
         SeriesVO child = find(userId, seriesId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())
                 && !CategoryConstant.DEFAULT_NAME.equals(vo.getName().trim())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
@@ -74,16 +81,20 @@ public class SeriesServiceImpl implements SeriesService {
     @Transactional
     public void delete(Long userId, Long seriesId) {
         SeriesVO child = find(userId, seriesId);
+
         if (CategoryConstant.DEFAULT_NAME.equals(child.getName())) {
             throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
         }
         if (seriesMapper.countByParent(userId, child.getGroupId()) <= 1) {
             throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
         }
+
         Long fallbackId = seriesMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
         if (fallbackId == null) {
             throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
+
         seriesMapper.moveInsertFallback(userId, seriesId, fallbackId);
         seriesMapper.moveDeleteLinks(userId, seriesId);
         seriesMapper.delete(userId, seriesId);
@@ -93,14 +104,17 @@ public class SeriesServiceImpl implements SeriesService {
     @Override
     public UsageResponseVO getUsage(Long userId, Long seriesId) {
         find(userId, seriesId);
+
         return new UsageResponseVO(seriesMapper.countUsage(userId, seriesId));
     }
 
     private SeriesVO find(Long userId, Long seriesId) {
         SeriesVO child = seriesMapper.selectById(userId, seriesId);
+
         if (child == null) {
             throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
         }
+
         return child;
     }
 }
