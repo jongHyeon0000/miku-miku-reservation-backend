@@ -3,6 +3,7 @@ package com.jong.mikumikureservationbackend.controller.shop;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.shop.ShopService;
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.shop.ShopVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "판매처 스토어", description = "판매처 하위 분류(예: 굿스마일 pw). 상품은 이 단위로 고른다.")
 @RestController
@@ -35,10 +35,14 @@ public class ShopController {
 
     @Operation(
             summary = "판매처 스토어 목록 조회 (예: 굿스마일 pw)",
-            description = "응답: id, groupId(상위 판매처 채널 id), name, description, url(없으면 생략), thumbnailUrl")
+            description = "쿼리: groupId: 상위 판매처 채널 id (선택, 생략하면 전체), page: 페이지 번호 (1부터, 기본 1), size: 한 페이지 개수 (기본 10)\n\n"
+                    + "응답: items(id, groupId, name, description, url(없으면 생략), thumbnailUrl), page, size, totalCount, totalPages. 이름이 기타인 항목은 항상 마지막")
     @GetMapping
-    public ApiResponse<List<ShopVO>> getAll() {
-        return ApiResponse.ok("조회가 완료되었습니다.", shopService.getAll(currentUser.getId()));
+    public ApiResponse<PageResponseVO<ShopVO>> getPage(
+            @Parameter(description = "상위 판매처 채널 id (생략하면 전체)", example = "1") @RequestParam(required = false) Long groupId,
+            @Parameter(description = "페이지 번호 (1부터)", example = "1") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "한 페이지 개수 (기본 10)", example = "10") @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.ok("조회가 완료되었습니다.", shopService.getPage(currentUser.getId(), groupId, page, size));
     }
 
     @Operation(

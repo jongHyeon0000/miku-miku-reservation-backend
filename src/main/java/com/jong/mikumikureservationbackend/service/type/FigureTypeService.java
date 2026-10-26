@@ -1,13 +1,12 @@
 package com.jong.mikumikureservationbackend.service.type;
 
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.type.FigureTypeVO;
 
-import java.util.List;
-
 public interface FigureTypeService {
 
-    List<FigureTypeVO> getAll(Long userId);
+    PageResponseVO<FigureTypeVO> getPage(Long userId, Long groupId, int page, int size);
 
     FigureTypeVO create(Long userId, FigureTypeVO vo);
 

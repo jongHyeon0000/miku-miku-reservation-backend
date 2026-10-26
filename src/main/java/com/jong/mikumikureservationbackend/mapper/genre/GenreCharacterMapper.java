@@ -11,6 +11,10 @@ public interface GenreCharacterMapper {
 
     List<GenreCharacterVO> selectAll(@Param("userId") Long userId);
 
+    List<GenreCharacterVO> selectPage(@Param("userId") Long userId, @Param("groupId") Long groupId, @Param("defaultName") String defaultName, @Param("offset") long offset, @Param("size") int size);
+
+    long countAll(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
     GenreCharacterVO selectById(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
 
     GenreCharacterVO selectByParentAndName(@Param("userId") Long userId, @Param("genreCharacterGroupId") Long genreCharacterGroupId,

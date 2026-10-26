@@ -11,6 +11,10 @@ public interface FigureTypeMapper {
 
     List<FigureTypeVO> selectAll(@Param("userId") Long userId);
 
+    List<FigureTypeVO> selectPage(@Param("userId") Long userId, @Param("groupId") Long groupId, @Param("defaultName") String defaultName, @Param("offset") long offset, @Param("size") int size);
+
+    long countAll(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
     FigureTypeVO selectById(@Param("userId") Long userId, @Param("figureTypeId") Long figureTypeId);
 
     FigureTypeVO selectByParentAndName(@Param("userId") Long userId, @Param("figureTypeGroupId") Long figureTypeGroupId,

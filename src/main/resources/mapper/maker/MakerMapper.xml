@@ -11,6 +11,22 @@
         ORDER BY e.maker_id
     </select>
 
+    <select id="selectPage" resultType="MakerVO">
+        SELECT e.maker_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM maker e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'MAKER' AND t.target_id = e.maker_id
+        WHERE e.user_id = #{userId}
+        ORDER BY (e.name = #{defaultName}), e.maker_id
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM maker e
+        WHERE e.user_id = #{userId}
+    </select>
+
     <select id="selectById" resultType="MakerVO">
         SELECT e.maker_id AS id, e.user_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url

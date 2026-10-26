@@ -8,6 +8,7 @@ import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterGroupMappe
 import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.mikumikureservationbackend.service.genre.GenreCharacterService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -29,13 +29,16 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     private final ThumbnailImageService thumbnailImageService;
 
     @Override
-    public List<GenreCharacterVO> getAll(Long userId) {
-        List<GenreCharacterVO> list = genreCharacterMapper.selectAll(userId);
+    public PageResponseVO<GenreCharacterVO> getPage(Long userId, Long groupId, int page, int size) {
+        if (page < 1 || size < 1) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "page, size는 1 이상이어야 합니다");
+        }
 
-        // 아무 카테고리에도 해당되지 않는 미분류(기타)는 항상 맨 뒤로 보낸다(안정 정렬이라 나머지는 생성 순 유지)
-        list.sort(Comparator.comparing(v -> CategoryConstant.DEFAULT_NAME.equals(v.getName())));
+        long offset = (long) (page - 1) * size;
+        long totalCount = genreCharacterMapper.countAll(userId, groupId);
+        List<GenreCharacterVO> items = genreCharacterMapper.selectPage(userId, groupId, CategoryConstant.DEFAULT_NAME, offset, size);
 
-        return list;
+        return new PageResponseVO<>(items, page, size, totalCount);
     }
 
     @Override

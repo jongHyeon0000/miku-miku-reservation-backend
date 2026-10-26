@@ -1,13 +1,12 @@
 package com.jong.mikumikureservationbackend.service.shop;
 
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.shop.ShopVO;
 
-import java.util.List;
-
 public interface ShopService {
 
-    List<ShopVO> getAll(Long userId);
+    PageResponseVO<ShopVO> getPage(Long userId, Long groupId, int page, int size);
 
     ShopVO create(Long userId, ShopVO vo);
 

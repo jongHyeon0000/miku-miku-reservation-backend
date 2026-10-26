@@ -1,13 +1,12 @@
 package com.jong.mikumikureservationbackend.service.genre;
 
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 
-import java.util.List;
-
 public interface GenreCharacterService {
 
-    List<GenreCharacterVO> getAll(Long userId);
+    PageResponseVO<GenreCharacterVO> getPage(Long userId, Long groupId, int page, int size);
 
     GenreCharacterVO create(Long userId, GenreCharacterVO vo);
 

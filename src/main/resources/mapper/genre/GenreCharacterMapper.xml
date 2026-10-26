@@ -11,6 +11,28 @@
         ORDER BY e.genre_character_id
     </select>
 
+    <select id="selectPage" resultType="GenreCharacterVO">
+        SELECT e.genre_character_id AS id, e.user_id, e.genre_character_group_id AS group_id, e.name, e.description, e.created_at, e.updated_at,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM genre_character e
+        LEFT JOIN thumbnail_image t ON t.user_id = e.user_id AND t.target_type = 'GENRE_CHARACTER' AND t.target_id = e.genre_character_id
+        WHERE e.user_id = #{userId}
+        <if test="groupId != null">
+            AND e.genre_character_group_id = #{groupId}
+        </if>
+        ORDER BY (e.name = #{defaultName}), e.genre_character_id
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM genre_character e
+        WHERE e.user_id = #{userId}
+        <if test="groupId != null">
+            AND e.genre_character_group_id = #{groupId}
+        </if>
+    </select>
+
     <select id="selectById" resultType="GenreCharacterVO">
         SELECT e.genre_character_id AS id, e.user_id, e.genre_character_group_id AS group_id, e.name, e.description, e.created_at, e.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url

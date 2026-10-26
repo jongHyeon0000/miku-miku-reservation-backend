@@ -7,6 +7,7 @@ import com.jong.mikumikureservationbackend.common.exception.BusinessException;
 import com.jong.mikumikureservationbackend.mapper.maker.MakerMapper;
 import com.jong.mikumikureservationbackend.service.maker.MakerService;
 import com.jong.mikumikureservationbackend.service.thumbnail.ThumbnailImageService;
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,19 @@ public class MakerServiceImpl implements MakerService {
         list.sort(Comparator.comparing(v -> CategoryConstant.DEFAULT_NAME.equals(v.getName())));
 
         return list;
+    }
+
+    @Override
+    public PageResponseVO<MakerVO> getPage(Long userId, int page, int size) {
+        if (page < 1 || size < 1) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "page, size는 1 이상이어야 합니다");
+        }
+
+        long offset = (long) (page - 1) * size;
+        long totalCount = makerMapper.countAll(userId);
+        List<MakerVO> items = makerMapper.selectPage(userId, CategoryConstant.DEFAULT_NAME, offset, size);
+
+        return new PageResponseVO<>(items, page, size, totalCount);
     }
 
     @Override

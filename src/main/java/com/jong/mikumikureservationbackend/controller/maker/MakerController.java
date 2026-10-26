@@ -3,6 +3,7 @@ package com.jong.mikumikureservationbackend.controller.maker;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.service.maker.MakerService;
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "제조사", description = "제조사(예: 세가). 상하위 없이 평면이다.")
 @RestController
@@ -35,10 +35,13 @@ public class MakerController {
 
     @Operation(
             summary = "제조사 목록 조회 (예: 세가, 후류)",
-            description = "응답: id, name, description, thumbnailUrl")
+            description = "쿼리: page: 페이지 번호 (1부터, 기본 1), size: 한 페이지 개수 (기본 10)\n\n"
+                    + "응답: items(id, name, description, thumbnailUrl), page, size, totalCount, totalPages. 이름이 기타인 항목은 항상 마지막")
     @GetMapping
-    public ApiResponse<List<MakerVO>> getAll() {
-        return ApiResponse.ok("조회가 완료되었습니다.", makerService.getAll(currentUser.getId()));
+    public ApiResponse<PageResponseVO<MakerVO>> getPage(
+            @Parameter(description = "페이지 번호 (1부터)", example = "1") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "한 페이지 개수 (기본 10)", example = "10") @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.ok("조회가 완료되었습니다.", makerService.getPage(currentUser.getId(), page, size));
     }
 
     @Operation(

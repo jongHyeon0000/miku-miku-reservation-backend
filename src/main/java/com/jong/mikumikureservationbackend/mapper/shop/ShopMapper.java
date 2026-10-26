@@ -11,6 +11,10 @@ public interface ShopMapper {
 
     List<ShopVO> selectAll(@Param("userId") Long userId);
 
+    List<ShopVO> selectPage(@Param("userId") Long userId, @Param("groupId") Long groupId, @Param("defaultName") String defaultName, @Param("offset") long offset, @Param("size") int size);
+
+    long countAll(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
     ShopVO selectById(@Param("userId") Long userId, @Param("shopId") Long shopId);
 
     ShopVO selectByParentAndName(@Param("userId") Long userId, @Param("shopGroupId") Long shopGroupId,

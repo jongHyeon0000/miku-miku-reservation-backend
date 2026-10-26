@@ -1,13 +1,12 @@
 package com.jong.mikumikureservationbackend.service.series;
 
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesVO;
 
-import java.util.List;
-
 public interface SeriesService {
 
-    List<SeriesVO> getAll(Long userId);
+    PageResponseVO<SeriesVO> getPage(Long userId, Long groupId, int page, int size);
 
     SeriesVO create(Long userId, SeriesVO vo);
 

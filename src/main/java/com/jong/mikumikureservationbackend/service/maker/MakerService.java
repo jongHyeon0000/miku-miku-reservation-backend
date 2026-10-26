@@ -1,5 +1,6 @@
 package com.jong.mikumikureservationbackend.service.maker;
 
+import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 
@@ -8,6 +9,8 @@ import java.util.List;
 public interface MakerService {
 
     List<MakerVO> getAll(Long userId);
+
+    PageResponseVO<MakerVO> getPage(Long userId, int page, int size);
 
     MakerVO create(Long userId, MakerVO vo);
 

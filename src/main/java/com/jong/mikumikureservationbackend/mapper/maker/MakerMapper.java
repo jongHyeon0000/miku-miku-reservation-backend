@@ -11,6 +11,10 @@ public interface MakerMapper {
 
     List<MakerVO> selectAll(@Param("userId") Long userId);
 
+    List<MakerVO> selectPage(@Param("userId") Long userId, @Param("defaultName") String defaultName, @Param("offset") long offset, @Param("size") int size);
+
+    long countAll(@Param("userId") Long userId);
+
     MakerVO selectById(@Param("userId") Long userId, @Param("makerId") Long makerId);
 
     MakerVO selectByName(@Param("userId") Long userId, @Param("name") String name);

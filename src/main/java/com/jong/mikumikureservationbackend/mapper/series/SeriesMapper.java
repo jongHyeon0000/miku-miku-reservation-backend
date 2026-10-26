@@ -11,6 +11,10 @@ public interface SeriesMapper {
 
     List<SeriesVO> selectAll(@Param("userId") Long userId);
 
+    List<SeriesVO> selectPage(@Param("userId") Long userId, @Param("groupId") Long groupId, @Param("defaultName") String defaultName, @Param("offset") long offset, @Param("size") int size);
+
+    long countAll(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
     SeriesVO selectById(@Param("userId") Long userId, @Param("seriesId") Long seriesId);
 
     SeriesVO selectByParentAndName(@Param("userId") Long userId, @Param("seriesGroupId") Long seriesGroupId,
