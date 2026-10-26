@@ -40,9 +40,8 @@ out/
 src/main/resources/application-prod.yaml
 src/main/resources/application-local.yaml
 
-### 문서 (doc/database, doc/readme만 저장소에 둔다) ###
+### 문서 (doc/readme만 저장소에 둔다) ###
 /doc/*
-!/doc/database/
 !/doc/readme/
 
 ### Claude 지침 파일 ###
