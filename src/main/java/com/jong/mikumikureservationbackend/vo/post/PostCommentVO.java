@@ -69,6 +69,10 @@ public class PostCommentVO {
     @Schema(description = "작성자 이름", example = "미쿠")
     private String authorName;
 
+    /** [thumbnail_image joined] 작성자 프로필 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다) */
+    @Schema(description = "작성자 프로필 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다)", example = "/uploads/1/thumbnail-image/user/2026/10/abc.png")
+    private String authorThumbnailUrl;
+
     /** [users joined] 답글 대상 사용자 이름 (대상이 탈퇴했으면 빠진다) */
     @Schema(description = "답글 대상 사용자 이름. 대상이 탈퇴했으면 빠진다", example = "미쿠")
     private String mentionUserName;

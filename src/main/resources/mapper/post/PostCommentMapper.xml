@@ -4,26 +4,28 @@
 
     <!-- 삭제, 탈퇴한 댓글도 포함한다(답글 구조를 유지하려고. 내용 가림은 서비스가 한다). 멘션 대상이 탈퇴했으면 id와 이름을 뺀다 -->
     <select id="selectByPost" resultType="PostCommentVO">
-        SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name,
+        SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
                IF(m.status = 'ACTIVE', c.mention_user_id, NULL) AS mention_user_id,
                IF(m.status = 'ACTIVE', m.name, NULL) AS mention_user_name,
                c.content, c.status, c.created_at, c.updated_at,
                (c.user_id = #{userId}) AS mine
         FROM post_comment c
         JOIN users u ON u.user_id = c.user_id
+        LEFT JOIN thumbnail_image t ON t.user_id = u.user_id AND t.target_type = 'USER' AND t.target_id = u.user_id
         LEFT JOIN users m ON m.user_id = c.mention_user_id
         WHERE c.post_id = #{postId}
         ORDER BY c.post_comment_id
     </select>
 
     <select id="selectById" resultType="PostCommentVO">
-        SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name,
+        SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
                IF(m.status = 'ACTIVE', c.mention_user_id, NULL) AS mention_user_id,
                IF(m.status = 'ACTIVE', m.name, NULL) AS mention_user_name,
                c.content, c.status, c.created_at, c.updated_at,
                (c.user_id = #{userId}) AS mine
         FROM post_comment c
         JOIN users u ON u.user_id = c.user_id
+        LEFT JOIN thumbnail_image t ON t.user_id = u.user_id AND t.target_type = 'USER' AND t.target_id = u.user_id
         LEFT JOIN users m ON m.user_id = c.mention_user_id
         WHERE c.post_comment_id = #{postCommentId}
     </select>

@@ -115,6 +115,7 @@ public class PostServiceImpl implements PostService {
     private void hideContent(PostVO post) {
         post.setTitle(null);
         post.setAuthorName(null);
+        post.setAuthorThumbnailUrl(null);
         post.setViewCount(null);
         post.setCommentCount(null);
         post.setMine(null);

@@ -65,6 +65,10 @@ public class PostVO {
     @Schema(description = "작성자 이름", example = "미쿠")
     private String authorName;
 
+    /** [thumbnail_image joined] 작성자 프로필 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다) */
+    @Schema(description = "작성자 프로필 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다)", example = "/uploads/1/thumbnail-image/user/2026/10/abc.png")
+    private String authorThumbnailUrl;
+
     /** [response] 댓글 수 (삭제, 탈퇴한 댓글 포함 전체) */
     @Schema(description = "댓글 수 (삭제, 탈퇴한 댓글 포함 전체)", example = "5")
     private Integer commentCount;

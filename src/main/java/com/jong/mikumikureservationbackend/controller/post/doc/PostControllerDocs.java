@@ -17,7 +17,7 @@ public interface PostControllerDocs {
     @Operation(
             summary = "게시글 목록 조회 (예: 최신 글 10개)",
             description = "쿼리: page: 페이지 번호 (1부터, 기본 1), size: 한 페이지 개수 (기본 10)\n\n"
-                    + "응답: items(postId, title, authorName, viewCount, commentCount, createdAt, status, mine), page, size, totalCount, totalPages. 최신순이고 본문은 없다. "
+                    + "응답: items(postId, title, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, status, mine), page, size, totalCount, totalPages. 최신순이고 본문은 없다. "
                     + "삭제(DELETED), 탈퇴(WITHDRAWN)한 글은 자리에 남지만 postId, status, createdAt만 나온다")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "items, page, size, totalCount, totalPages"),
@@ -30,9 +30,9 @@ public interface PostControllerDocs {
     @Operation(
             summary = "게시글 상세 조회 (예: 글 열기, 조회수 +1)",
             description = "호출할 때마다 조회수가 1 오르고 응답의 viewCount는 오른 뒤 값이다.\n\n"
-                    + "응답: postId, title, content(에디터 HTML), authorName, viewCount, commentCount, createdAt, updatedAt, status, mine")
+                    + "응답: postId, title, content(에디터 HTML), authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, updatedAt, status, mine")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "postId, title, content, authorName, viewCount, commentCount, createdAt, updatedAt, status, mine"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "postId, title, content, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, updatedAt, status, mine"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "없는 글, 삭제 또는 탈퇴한 글")
     })
     ApiResponse<PostVO> getDetail(

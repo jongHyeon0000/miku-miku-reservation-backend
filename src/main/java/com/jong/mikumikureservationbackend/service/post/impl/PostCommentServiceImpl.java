@@ -199,6 +199,7 @@ public class PostCommentServiceImpl implements PostCommentService {
     private void hideContent(PostCommentVO comment) {
         comment.setUserId(null);
         comment.setAuthorName(null);
+        comment.setAuthorThumbnailUrl(null);
         comment.setMentionUserId(null);
         comment.setMentionUserName(null);
         comment.setContent(null);

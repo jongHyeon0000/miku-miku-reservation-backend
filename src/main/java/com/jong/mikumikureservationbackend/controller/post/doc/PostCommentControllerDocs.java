@@ -17,7 +17,7 @@ public interface PostCommentControllerDocs {
     @Operation(
             summary = "댓글 목록 조회 (예: 글의 댓글과 답글 전체)",
             description = "페이지 없이 그 글의 댓글 전체를 준다. 최상위 댓글은 오래된 것이 먼저이고 각 replies(답글, 오래된 것이 먼저)에 답글이 담긴다.\n\n"
-                    + "응답: 최상위 댓글 배열. 항목: postCommentId, parentPostCommentId(답글만), userId, authorName, mentionUserId와 mentionUserName(멘션이 있고 대상이 탈퇴하지 않았을 때만), content, images(postCommentImageId, url), createdAt, updatedAt, status, mine, replies. "
+                    + "응답: 최상위 댓글 배열. 항목: postCommentId, parentPostCommentId(답글만), userId, authorName, authorThumbnailUrl(없으면 생략), mentionUserId와 mentionUserName(멘션이 있고 대상이 탈퇴하지 않았을 때만), content, images(postCommentImageId, url), createdAt, updatedAt, status, mine, replies. "
                     + "삭제(DELETED), 탈퇴(WITHDRAWN)한 댓글은 그 자리에 남지만 postCommentId, parentPostCommentId, status, createdAt, replies만 나온다")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "최상위 댓글 배열 (답글은 replies 안)"),
