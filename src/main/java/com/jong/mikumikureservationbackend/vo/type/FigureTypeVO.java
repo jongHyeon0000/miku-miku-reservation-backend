@@ -52,6 +52,10 @@ public class FigureTypeVO {
     @Schema(description = "수정일시", example = "2026-10-12T21:30:00")
     private LocalDateTime updatedAt;
 
+    /** [figure_type_group joined] 상위 형태명 */
+    @Schema(description = "상위 형태명 (상품 응답의 분류 정보에서만 나온다)")
+    private String groupName;
+
     /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다) */
     @Schema(description = "썸네일 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다) (조회 응답에서만 나온다)")
     private String thumbnailUrl;

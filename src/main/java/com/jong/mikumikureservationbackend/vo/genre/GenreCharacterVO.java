@@ -53,6 +53,10 @@ public class GenreCharacterVO {
     @Schema(description = "수정일시", example = "2026-10-12T21:30:00")
     private LocalDateTime updatedAt;
 
+    /** [genre_character_group joined] 소속 장르명 */
+    @Schema(description = "소속 장르명 (상품 응답의 분류 정보에서만 나온다)")
+    private String groupName;
+
     /** [figure_character_map joined] 이 캐릭터가 연결된 상품 (figure_id). 상품별로 묶을 때만 쓰고 응답에는 내보내지 않는다 */
     @JsonIgnore
     private Long figureId;
