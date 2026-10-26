@@ -20,7 +20,7 @@ import lombok.Setter;
 public class EmailVerificationVO {
 
     /** [request] 인증 대상 이메일 (소문자로 바꿔 처리) */
-    @Schema(description = "인증 대상 이메일 (소문자로 바꿔 처리)", example = "jong@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "인증 대상 이메일 (소문자로 바꿔 처리)", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     @Email
     @Size(max = 100)
@@ -31,7 +31,7 @@ public class EmailVerificationVO {
     private EmailVerificationPurpose purpose;
 
     /** [request] 로그인 아이디. 비밀번호 재설정 코드 발송에서만 필수 */
-    @Schema(description = "로그인 아이디. 비밀번호 재설정 코드 발송에서만 필수", example = "jong1234")
+    @Schema(description = "로그인 아이디. 비밀번호 재설정 코드 발송에서만 필수", example = "user1234")
     private String loginId;
 
     /** [request] 이메일로 받은 6자리 인증 코드. 코드 확인에서만 필수 */

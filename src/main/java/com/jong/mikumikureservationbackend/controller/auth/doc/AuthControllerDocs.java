@@ -28,7 +28,7 @@ public interface AuthControllerDocs {
                     + "응답: 성공 시 data 없음")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "발송 예", value = "{\"email\":\"jong@example.com\"}")
+            @ExampleObject(name = "발송 예", value = "{\"email\":\"user@example.com\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
@@ -38,14 +38,14 @@ public interface AuthControllerDocs {
     ApiResponse<Void> sendSignupEmailCode(EmailVerificationVO request);
 
     @Operation(
-            summary = "회원가입 (예: 아이디 jong1234, 닉네임 닉네임예시)",
+            summary = "회원가입 (예: 아이디 user1234, 닉네임 닉네임예시)",
             description = "인증이 필요 없다(토큰 없이 호출). 가입 전에 이메일 인증(코드 발송과 확인)을 끝내야 한다.\n\n"
                     + "요청 본문: loginId: 로그인 아이디 (본문, 필수, 영문과 숫자 4~30자), email: 이메일 (본문, 필수, 100자 이하), name: 닉네임 (본문, 필수, 20자 이하), password: 비밀번호 (본문, 필수, 8~20자)\n\n"
                     + "응답: 가입한 userId, loginId, email, name, createdAt, updatedAt (비밀번호 관련 값 없음)")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "가입 예",
-                    value = "{\"loginId\":\"jong1234\",\"email\":\"jong@example.com\",\"name\":\"닉네임예시\",\"password\":\"password1234\"}")
+                    value = "{\"loginId\":\"user1234\",\"email\":\"user@example.com\",\"name\":\"닉네임예시\",\"password\":\"password1234\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가입한 userId, loginId, email, name, createdAt, updatedAt (비밀번호 관련 값 없음)"),
@@ -61,7 +61,7 @@ public interface AuthControllerDocs {
                     + "응답: 성공 시 data 없음")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "발송 예", value = "{\"email\":\"jong@example.com\"}")
+            @ExampleObject(name = "발송 예", value = "{\"email\":\"user@example.com\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
@@ -77,7 +77,7 @@ public interface AuthControllerDocs {
                     + "응답: loginId: 그 이메일로 가입한 로그인 아이디 (인증은 한 번 쓰면 소모된다)")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "아이디 찾기 예", value = "{\"email\":\"jong@example.com\"}")
+            @ExampleObject(name = "아이디 찾기 예", value = "{\"email\":\"user@example.com\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "loginId: 그 이메일로 가입한 로그인 아이디"),
@@ -86,14 +86,14 @@ public interface AuthControllerDocs {
     ApiResponse<FindIdResponseVO> findId(EmailVerificationVO request);
 
     @Operation(
-            summary = "비밀번호 재설정용 이메일 인증 코드 발송 (예: 아이디 jong1234 의 가입 이메일로 6자리 코드 받기)",
+            summary = "비밀번호 재설정용 이메일 인증 코드 발송 (예: 아이디 user1234 의 가입 이메일로 6자리 코드 받기)",
             description = "인증이 필요 없다(토큰 없이 호출). 재설정 순서: 이 API로 코드 받기 → POST /api/auth/email-verification/verify(purpose: RESET_PASSWORD)로 코드 확인 → POST /api/auth/reset-password로 새 비밀번호 설정\n\n"
                     + "요청 본문: email: 이메일 (본문, 필수, 100자 이하), loginId: 로그인 아이디 (본문, 필수)\n\n"
                     + "규칙: 아이디와 이메일이 같은 계정일 때만 발송한다. 코드는 6자리 숫자이고 10분 동안 유효하며, 같은 이메일은 60초 뒤에 다시 받을 수 있다.\n\n"
                     + "응답: 성공 시 data 없음")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "발송 예", value = "{\"email\":\"jong@example.com\",\"loginId\":\"jong1234\"}")
+            @ExampleObject(name = "발송 예", value = "{\"email\":\"user@example.com\",\"loginId\":\"user1234\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
@@ -111,7 +111,7 @@ public interface AuthControllerDocs {
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "재설정 예",
-                    value = "{\"loginId\":\"jong1234\",\"email\":\"jong@example.com\",\"newPassword\":\"newPassword1234\"}")
+                    value = "{\"loginId\":\"user1234\",\"email\":\"user@example.com\",\"newPassword\":\"newPassword1234\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
@@ -120,14 +120,14 @@ public interface AuthControllerDocs {
     ApiResponse<Void> resetPassword(ResetPasswordRequestVO request);
 
     @Operation(
-            summary = "로그인, JWT 발급 (예: jong1234 로 로그인)",
+            summary = "로그인, JWT 발급 (예: user1234 로 로그인)",
             description = "인증이 필요 없다(토큰 없이 호출).\n\n"
                     + "요청 본문: loginId: 로그인 아이디 (본문, 필수), password: 비밀번호 (본문, 필수)\n\n"
                     + "응답: accessToken: 이후 요청의 Authorization: Bearer 헤더에 쓸 토큰 (24시간 유효)")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "로그인 예",
-                    value = "{\"loginId\":\"jong1234\",\"password\":\"password1234\"}")
+                    value = "{\"loginId\":\"user1234\",\"password\":\"password1234\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "accessToken: 이후 요청의 Authorization: Bearer 헤더에 쓸 토큰 (24시간 유효)"),

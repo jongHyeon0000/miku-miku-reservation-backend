@@ -20,7 +20,7 @@ public interface EmailVerificationControllerDocs {
                     + "규칙: 코드가 맞으면 인증 완료가 되고 30분 안에 해당 기능(가입 등)에서 쓸 수 있다(쓰면 소모된다). 틀리면 횟수가 쌓이고 5회가 넘으면 코드를 다시 받아야 한다. 코드 유효 시간은 10분이다.\n\n"
                     + "응답: 성공 시 data 없음")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "가입 코드 확인 예", value = "{\"email\":\"jong@example.com\",\"purpose\":\"SIGNUP\",\"code\":\"123456\"}")
+            @ExampleObject(name = "가입 코드 확인 예", value = "{\"email\":\"user@example.com\",\"purpose\":\"SIGNUP\",\"code\":\"123456\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),

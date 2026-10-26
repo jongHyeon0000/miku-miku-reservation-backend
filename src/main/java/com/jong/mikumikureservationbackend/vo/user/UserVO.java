@@ -30,13 +30,13 @@ public class UserVO {
     private Long userId;
 
     /** 로그인 아이디 (영문, 숫자 4~30자, 대소문자 구분) */
-    @Schema(description = "로그인 아이디 (영문, 숫자 4~30자, 대소문자 구분)", example = "jong1234", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "로그인 아이디 (영문, 숫자 4~30자, 대소문자 구분)", example = "user1234", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     @Pattern(regexp = "^[A-Za-z0-9]{4,30}$", message = "영문과 숫자 4~30자여야 합니다")
     private String loginId;
 
     /** 이메일 (소문자로 저장) */
-    @Schema(description = "이메일 (소문자로 저장)", example = "jong@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "이메일 (소문자로 저장)", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     @Email
     @Size(max = 100)

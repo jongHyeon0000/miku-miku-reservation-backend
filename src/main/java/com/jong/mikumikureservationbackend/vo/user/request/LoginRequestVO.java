@@ -16,7 +16,7 @@ import lombok.Setter;
 public class LoginRequestVO {
 
     /** 로그인 아이디 */
-    @Schema(description = "로그인 아이디", example = "jong1234", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "로그인 아이디", example = "user1234", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String loginId;
 

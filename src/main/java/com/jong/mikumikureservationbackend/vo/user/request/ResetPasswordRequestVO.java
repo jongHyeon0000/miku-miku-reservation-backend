@@ -19,12 +19,12 @@ import lombok.Setter;
 public class ResetPasswordRequestVO {
 
     /** [request] 로그인 아이디 (이메일과 같은 계정이어야 함) */
-    @Schema(description = "로그인 아이디 (이메일과 같은 계정이어야 함)", example = "jong1234", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "로그인 아이디 (이메일과 같은 계정이어야 함)", example = "user1234", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String loginId;
 
     /** [request] 이메일 (인증을 마친 이메일, 소문자로 바꿔 처리) */
-    @Schema(description = "이메일 (인증을 마친 이메일, 소문자로 바꿔 처리)", example = "jong@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "이메일 (인증을 마친 이메일, 소문자로 바꿔 처리)", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     @Email
     @Size(max = 100)

@@ -13,6 +13,6 @@ import lombok.RequiredArgsConstructor;
 public class FindIdResponseVO {
 
     /** 이메일로 가입된 계정의 로그인 아이디 */
-    @Schema(description = "이메일로 가입된 계정의 로그인 아이디", example = "jong1234")
+    @Schema(description = "이메일로 가입된 계정의 로그인 아이디", example = "user1234")
     private final String loginId;
 }
