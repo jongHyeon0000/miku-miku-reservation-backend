@@ -21,5 +21,5 @@ public interface UserMapper {
 
     int updatePassword(@Param("userId") Long userId, @Param("passwordHash") String passwordHash);
 
-    int delete(@Param("userId") Long userId);
+    int withdraw(@Param("userId") Long userId);
 }

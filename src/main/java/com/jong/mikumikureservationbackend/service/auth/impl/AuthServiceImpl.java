@@ -6,7 +6,6 @@ import com.jong.mikumikureservationbackend.common.constant.GlobalExceptionCode;
 import com.jong.mikumikureservationbackend.common.exception.BusinessException;
 import com.jong.mikumikureservationbackend.common.security.AuthUser;
 import com.jong.mikumikureservationbackend.common.security.JwtProvider;
-import com.jong.mikumikureservationbackend.mapper.figure.FigureMapper;
 import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterGroupMapper;
 import com.jong.mikumikureservationbackend.mapper.genre.GenreCharacterMapper;
 import com.jong.mikumikureservationbackend.mapper.maker.MakerMapper;
@@ -19,7 +18,6 @@ import com.jong.mikumikureservationbackend.mapper.type.FigureTypeMapper;
 import com.jong.mikumikureservationbackend.mapper.user.UserMapper;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
 import com.jong.mikumikureservationbackend.service.auth.EmailVerificationService;
-import com.jong.mikumikureservationbackend.service.common.ImageFileStore;
 import com.jong.mikumikureservationbackend.vo.user.response.FindIdResponseVO;
 import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.response.LoginResponseVO;
@@ -33,8 +31,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Locale;
 
@@ -44,7 +40,6 @@ import java.util.Locale;
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
-    private final FigureMapper figureMapper;
     private final ShopGroupMapper shopGroupMapper;
     private final ShopMapper shopMapper;
     private final FigureTypeGroupMapper figureTypeGroupMapper;
@@ -57,7 +52,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
-    private final ImageFileStore imageFileStore;
     private final EmailVerificationService emailVerificationService;
 
     @Override
@@ -208,17 +202,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "비밀번호가 일치하지 않습니다");
         }
 
-        // 상품이 분류를 RESTRICT로 참조하므로 상품을 먼저 지운다
-        figureMapper.deleteAllByUser(userId);
-        userMapper.delete(userId);
-
-        // 롤백 시 파일만 사라지지 않도록 커밋 뒤에 지운다
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                imageFileStore.deleteDirectory(String.valueOf(userId));
-            }
-        });
+        userMapper.withdraw(userId);
     }
 
     private UserVO selectMatchingUser(String loginId, String normalizedEmail) {
