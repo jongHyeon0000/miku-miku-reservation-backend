@@ -19,6 +19,10 @@ public interface PostControllerDocs {
             description = "쿼리: page: 페이지 번호 (1부터, 기본 1), size: 한 페이지 개수 (기본 10)\n\n"
                     + "응답: items(postId, title, authorName, viewCount, commentCount, createdAt, status, mine), page, size, totalCount, totalPages. 최신순이고 본문은 없다. "
                     + "삭제(DELETED), 탈퇴(WITHDRAWN)한 글은 자리에 남지만 postId, status, createdAt만 나온다")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "items, page, size, totalCount, totalPages"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "page 또는 size가 1 미만")
+    })
     ApiResponse<PageResponseVO<PostVO>> getPage(
             @Parameter(description = "페이지 번호 (1부터)", example = "1") int page,
             @Parameter(description = "한 페이지 개수 (기본 10)", example = "10") int size);

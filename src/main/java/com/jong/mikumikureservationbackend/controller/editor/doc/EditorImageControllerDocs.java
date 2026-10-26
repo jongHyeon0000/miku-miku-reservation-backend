@@ -9,11 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.multipart.MultipartFile;
 
 /* EditorImageController의 Swagger 설명 전용 인터페이스. 로직은 EditorImageController에만 둔다 */
-@Tag(name = "에디터 이미지", description = "상품 설명(HTML)에 넣는 이미지 업로드. 설명에 쓰이지 않은 이미지는 1일 뒤 매일 00시에 자동 정리된다.")
+@Tag(name = "에디터 이미지", description = "상품 설명과 커뮤니티 글 본문(HTML)에 넣는 이미지 업로드. 상품이나 글에 쓰이지 않은 이미지는 1일 뒤 매일 00시에 자동 정리된다.")
 public interface EditorImageControllerDocs {
 
     @Operation(
-            summary = "에디터 이미지 업로드 (예: 상품 설명에 넣을 사진)",
+            summary = "에디터 이미지 업로드 (예: 상품 설명이나 글에 넣을 사진)",
             description = "응답: editorImageId, url(에디터가 이미지 src로 쓸 /uploads/ 주소)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "editorImageId, url(에디터가 이미지 src로 쓸 /uploads/ 주소)"),

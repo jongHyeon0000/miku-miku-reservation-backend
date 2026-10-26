@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface EditorImageCleanupControllerDocs {
 
     @Operation(
-            summary = "고아 에디터 이미지 정리 수동 실행 (예: 어떤 상품에도 안 쓰이는 이미지 지우기)",
+            summary = "고아 에디터 이미지 정리 수동 실행 (예: 어떤 상품이나 글에도 안 쓰이는 이미지 지우기)",
             description = "응답: scannedCount: 정리 대상 수, deletedCount: 삭제 수, failedCount: 실패 수")
     ApiResponse<EditorImageCleanupResponseVO> cleanup();
 }

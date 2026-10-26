@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.multipart.MultipartFile;
 
 /* ThumbnailImageController의 Swagger 설명 전용 인터페이스. 로직은 ThumbnailImageController에만 둔다 */
-@Tag(name = "썸네일 이미지", description = "상품과 분류 9종 공통 썸네일. 대상당 1개이며 올리면 교체된다.")
+@Tag(name = "썸네일 이미지", description = "상품, 분류 9종, 내 프로필 공통 썸네일. 대상당 1개이며 올리면 교체된다.")
 public interface ThumbnailImageControllerDocs {
 
     @Operation(

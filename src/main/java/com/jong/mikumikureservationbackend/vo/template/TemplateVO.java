@@ -31,7 +31,7 @@ public class TemplateVO {
     private String name;
 
     /** 설명 (일반 텍스트) */
-    @Schema(description = "설명 (일반 텍스트)", example = "동방프로젝트 주요 캐릭터")
+    @Schema(description = "설명 (일반 텍스트, 없으면 응답에서 빠진다)", example = "동방프로젝트 주요 캐릭터")
     private String description;
 
     /** [response] 가져오면 만들어지는 하위 항목 수 (상위 그룹은 세지 않는다) */
@@ -39,6 +39,6 @@ public class TemplateVO {
     private Integer itemCount;
 
     /** [thumbnail_image joined] 대표 이미지 주소 */
-    @Schema(description = "대표 이미지 주소", example = "/uploads/template/thumbnail-image/template/2026/10/abc.png")
+    @Schema(description = "대표 이미지 주소 (없으면 응답에서 빠진다)", example = "/uploads/template/thumbnail-image/template/2026/10/abc.png")
     private String thumbnailUrl;
 }

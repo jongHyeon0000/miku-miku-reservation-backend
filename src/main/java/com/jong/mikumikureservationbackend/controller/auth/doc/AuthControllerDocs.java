@@ -32,8 +32,7 @@ public interface AuthControllerDocs {
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 이미 가입된 이메일, 60초 안에 재요청"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "메일 발송 실패")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 이미 가입된 이메일, 60초 안에 재요청")
     })
     ApiResponse<Void> sendSignupEmailCode(EmailVerificationVO request);
 
@@ -65,8 +64,7 @@ public interface AuthControllerDocs {
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 가입되지 않은 이메일, 60초 안에 재요청"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "메일 발송 실패")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 가입되지 않은 이메일, 60초 안에 재요청")
     })
     ApiResponse<Void> sendFindIdEmailCode(EmailVerificationVO request);
 
@@ -97,8 +95,7 @@ public interface AuthControllerDocs {
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 아이디와 이메일이 같은 계정이 아님, 60초 안에 재요청"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "메일 발송 실패")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류, 아이디와 이메일이 같은 계정이 아님, 60초 안에 재요청")
     })
     ApiResponse<Void> sendResetPasswordEmailCode(EmailVerificationVO request);
 
@@ -161,15 +158,16 @@ public interface AuthControllerDocs {
     ApiResponse<Void> changePassword(ChangePasswordRequestVO request);
 
     @Operation(
-            summary = "회원 탈퇴 (예: 내 계정, 상품, 분류, 업로드 이미지 전부 삭제)",
+            summary = "회원 탈퇴 (예: 내 계정을 탈퇴 상태로 변경)",
             description = "요청 본문: password: 현재 비밀번호 (본문, 필수)\n\n"
-                    + "응답: 성공 시 data 없음 (되돌릴 수 없다)")
+                    + "규칙: 계정을 지우지 않고 탈퇴 상태로 바꾼다. 내가 쓴 글과 댓글도 탈퇴 상태가 되어 내용이 보이지 않는다. 상품, 분류, 이미지는 그대로 남는다. 탈퇴하면 기존 토큰은 401이 되고, 같은 아이디, 이메일로 다시 가입할 수 있으며 가입하면 새 계정으로 시작한다(이전 데이터는 이어지지 않는다).\n\n"
+                    + "응답: 성공 시 data 없음")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "탈퇴 예",
                     value = "{\"password\":\"password1234\"}")
     }))
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음 (되돌릴 수 없다)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "비밀번호 불일치, 입력값 오류"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조")
     })

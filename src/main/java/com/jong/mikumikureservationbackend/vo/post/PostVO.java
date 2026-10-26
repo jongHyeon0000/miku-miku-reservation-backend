@@ -66,7 +66,7 @@ public class PostVO {
     private String authorName;
 
     /** [response] 댓글 수 (삭제, 탈퇴한 댓글 포함 전체) */
-    @Schema(description = "댓글 수 (삭제, 탈퇴한 댓글 포함 전체, 목록에만 나온다)", example = "5")
+    @Schema(description = "댓글 수 (삭제, 탈퇴한 댓글 포함 전체)", example = "5")
     private Integer commentCount;
 
     /** [response] 내가 쓴 글인지 */

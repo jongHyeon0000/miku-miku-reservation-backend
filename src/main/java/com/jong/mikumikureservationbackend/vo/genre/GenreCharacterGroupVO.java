@@ -53,7 +53,7 @@ public class GenreCharacterGroupVO {
     @Schema(description = "하위 캐릭터 목록 (응답에서만 나온다)")
     private List<GenreCharacterVO> children;
 
-    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) */
-    @Schema(description = "썸네일 이미지 주소 (/uploads/ + file_path, 없으면 null) (조회 응답에서만 나온다)")
+    /** [thumbnail_image joined] 썸네일 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다) */
+    @Schema(description = "썸네일 이미지 주소 (/uploads/ + file_path, 없으면 응답에서 빠진다) (조회 응답에서만 나온다)")
     private String thumbnailUrl;
 }

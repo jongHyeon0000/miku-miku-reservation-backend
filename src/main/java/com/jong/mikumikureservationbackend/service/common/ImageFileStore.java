@@ -116,7 +116,7 @@ public class ImageFileStore {
         }
     }
 
-    /* 업로드 폴더 아래 폴더 하나를 통째로 지운다(탈퇴 때 {userId}). 업로드 폴더 밖이거나 실패하면 false(예외 없음) */
+    /* 업로드 폴더 아래 폴더 하나를 통째로 지운다. 업로드 폴더 밖이거나 실패하면 false(예외 없음) */
     public boolean deleteDirectory(String dirPath) {
         Path target = resolve(dirPath);
         Path root = uploadProperties.getDir().toAbsolutePath().normalize();

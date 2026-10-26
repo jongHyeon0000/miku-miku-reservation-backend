@@ -81,7 +81,7 @@ public interface FigureControllerDocs {
                     + "- 되돌리는 전이는 400이다(실수는 삭제 후 재등록).\n"
                     + "- `paymentType`은 미구매에서 넘길 때만 받는다(RESERVED는 DEPOSIT, PURCHASED는 FULL과만 짝이 맞는다).\n"
                     + "- `depositAmount`는 RESERVED 전이에서 필수다.\n"
-                    + "- `depositPaidAt`, `balanceDueDate`, `paidAt`, `deliveredAt`을 생략하면 서버의 오늘 날짜를 쓴다.")
+                    + "- `depositPaidAt`, `paidAt`, `deliveredAt`을 생략하면 서버의 오늘 날짜를 쓴다. `balanceDueDate`(잔금 예정일)는 생략하면 비워 두고, 이미 값이 있으면 유지한다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "전액 결제",
                     value = "{\"status\":\"PURCHASED\",\"paymentType\":\"FULL\",\"paidAt\":\"2026-10-08\"}"),
