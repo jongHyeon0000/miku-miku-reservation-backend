@@ -43,7 +43,7 @@ public class UserVO {
     private String email;
 
     /** 닉네임 (한글 포함 20자 이하) */
-    @Schema(description = "닉네임 (한글 포함 20자 이하)", example = "종현", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "닉네임 (한글 포함 20자 이하)", example = "닉네임예시", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     @Size(max = 20)
     private String name;

@@ -18,6 +18,8 @@ import com.jong.mikumikureservationbackend.mapper.type.FigureTypeMapper;
 import com.jong.mikumikureservationbackend.mapper.user.UserMapper;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
 import com.jong.mikumikureservationbackend.service.auth.EmailVerificationService;
+import com.jong.mikumikureservationbackend.service.post.PostCommentService;
+import com.jong.mikumikureservationbackend.service.post.PostService;
 import com.jong.mikumikureservationbackend.vo.user.response.FindIdResponseVO;
 import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.response.LoginResponseVO;
@@ -53,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final EmailVerificationService emailVerificationService;
+    private final PostService postService;
+    private final PostCommentService postCommentService;
 
     @Override
     @Transactional
@@ -202,6 +206,8 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "비밀번호가 일치하지 않습니다");
         }
 
+        postService.withdrawByUser(userId);
+        postCommentService.withdrawByUser(userId);
         userMapper.withdraw(userId);
     }
 

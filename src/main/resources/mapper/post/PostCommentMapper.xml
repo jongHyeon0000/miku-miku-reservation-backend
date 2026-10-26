@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.post.PostCommentMapper">
+
+    <!-- 삭제, 탈퇴한 댓글도 포함한다(답글 구조를 유지하려고. 내용 가림은 서비스가 한다). 멘션 대상이 탈퇴했으면 id와 이름을 뺀다 -->
+    <select id="selectByPost" resultType="PostCommentVO">
+        SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name,
+               IF(m.status = 'ACTIVE', c.mention_user_id, NULL) AS mention_user_id,
+               IF(m.status = 'ACTIVE', m.name, NULL) AS mention_user_name,
+               c.content, c.status, c.created_at, c.updated_at,
+               (c.user_id = #{userId}) AS mine
+        FROM post_comment c
+        JOIN users u ON u.user_id = c.user_id
+        LEFT JOIN users m ON m.user_id = c.mention_user_id
+        WHERE c.post_id = #{postId}
+        ORDER BY c.post_comment_id
+    </select>
+
+    <select id="selectById" resultType="PostCommentVO">
+        SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name,
+               IF(m.status = 'ACTIVE', c.mention_user_id, NULL) AS mention_user_id,
+               IF(m.status = 'ACTIVE', m.name, NULL) AS mention_user_name,
+               c.content, c.status, c.created_at, c.updated_at,
+               (c.user_id = #{userId}) AS mine
+        FROM post_comment c
+        JOIN users u ON u.user_id = c.user_id
+        LEFT JOIN users m ON m.user_id = c.mention_user_id
+        WHERE c.post_comment_id = #{postCommentId}
+    </select>
+
+    <!-- 소유자, 상태, 부모 확인용 -->
+    <select id="selectBrief" resultType="PostCommentVO">
+        SELECT post_comment_id, post_id, user_id, parent_post_comment_id, status
+        FROM post_comment
+        WHERE post_comment_id = #{postCommentId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO post_comment (user_id, post_id, parent_post_comment_id, mention_user_id, content)
+        VALUES (#{userId}, #{postId}, #{parentPostCommentId}, #{mentionUserId}, #{content})
+    </insert>
+
+    <!-- 같은 트랜잭션(같은 커넥션)에서 방금 넣은 행의 id -->
+    <select id="selectLastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <!-- 부모와 멘션은 바꾸지 않는다. post_comment.updated_at에는 자동 갱신이 없어서 직접 갱신한다 -->
+    <update id="update">
+        UPDATE post_comment
+        SET content = #{content}, updated_at = NOW()
+        WHERE post_comment_id = #{postCommentId} AND user_id = #{userId} AND status = 'NORMAL'
+    </update>
+
+    <!-- 삭제는 행을 지우지 않고 상태만 바꾼다(내용, 이미지는 보관) -->
+    <update id="softDelete">
+        UPDATE post_comment
+        SET status = 'DELETED', deleted_at = NOW()
+        WHERE post_comment_id = #{postCommentId} AND user_id = #{userId} AND status = 'NORMAL'
+    </update>
+
+    <!-- 이미 DELETED인 댓글은 그대로 DELETED로 남긴다 -->
+    <update id="withdrawByUser">
+        UPDATE post_comment
+        SET status = 'WITHDRAWN'
+        WHERE user_id = #{userId} AND status = 'NORMAL'
+    </update>
+
+</mapper>

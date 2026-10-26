@@ -59,14 +59,14 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "회원가입 (예: 아이디 jong1234, 닉네임 종현)",
+            summary = "회원가입 (예: 아이디 jong1234, 닉네임 닉네임예시)",
             description = "인증이 필요 없다(토큰 없이 호출). 가입 전에 이메일 인증(코드 발송과 확인)을 끝내야 한다.\n\n"
                     + "요청 본문: loginId: 로그인 아이디 (본문, 필수, 영문과 숫자 4~30자), email: 이메일 (본문, 필수, 100자 이하), name: 닉네임 (본문, 필수, 20자 이하), password: 비밀번호 (본문, 필수, 8~20자)\n\n"
                     + "응답: 가입한 userId, loginId, email, name, createdAt, updatedAt (비밀번호 관련 값 없음)")
     @SecurityRequirements
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "가입 예",
-                    value = "{\"loginId\":\"jong1234\",\"email\":\"jong@example.com\",\"name\":\"종현\",\"password\":\"password1234\"}")
+                    value = "{\"loginId\":\"jong1234\",\"email\":\"jong@example.com\",\"name\":\"닉네임예시\",\"password\":\"password1234\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가입한 userId, loginId, email, name, createdAt, updatedAt (비밀번호 관련 값 없음)"),

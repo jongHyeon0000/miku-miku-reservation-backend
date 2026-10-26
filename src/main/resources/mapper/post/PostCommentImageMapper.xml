@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.post.PostCommentImageMapper">
+
+    <!-- 업로드 직후에는 댓글과 연결하지 않는다(댓글을 저장할 때 연결) -->
+    <insert id="insert">
+        INSERT INTO post_comment_image (user_id, file_path, original_name, file_size)
+        VALUES (#{userId}, #{filePath}, #{originalName}, #{fileSize})
+    </insert>
+
+    <!-- 같은 트랜잭션(같은 커넥션)에서 방금 넣은 행의 id -->
+    <select id="selectLastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <select id="selectByCommentIds" resultType="PostCommentImageVO">
+        SELECT post_comment_image_id, post_comment_id, CONCAT('/uploads/', file_path) AS url
+        FROM post_comment_image
+        WHERE post_comment_id IN
+        <foreach collection="postCommentIds" item="postCommentId" open="(" separator="," close=")">
+            #{postCommentId}
+        </foreach>
+        ORDER BY post_comment_id, sort_order
+    </select>
+
+    <!-- 연결을 끊는다(행은 남고, 다시 연결하지 않으면 고아 정리가 지운다). 수정 때 최종 목록으로 다시 연결하려고 먼저 모두 끊는다 -->
+    <update id="detachAllByComment">
+        UPDATE post_comment_image
+        SET post_comment_id = NULL, sort_order = NULL
+        WHERE user_id = #{userId} AND post_comment_id = #{postCommentId}
+    </update>
+
+    <!-- 내가 올렸고 아직 어느 댓글에도 연결되지 않은 이미지만 연결된다. 아니면 0건 -->
+    <update id="attach">
+        UPDATE post_comment_image
+        SET post_comment_id = #{postCommentId}, sort_order = #{sortOrder}
+        WHERE post_comment_image_id = #{postCommentImageId} AND user_id = #{userId} AND post_comment_id IS NULL
+    </update>
+
+    <!-- 정리 대상: 업로드 후 retentionDays일이 지났고 어떤 댓글과도 연결되지 않은 이미지 (모든 사용자 대상의 시스템 작업이라 user_id 조건 없음) -->
+    <select id="selectOrphans" resultType="PostCommentImageVO">
+        SELECT post_comment_image_id, user_id, file_path
+        FROM post_comment_image
+        WHERE post_comment_id IS NULL
+          AND created_at &lt; NOW() - INTERVAL #{retentionDays} DAY
+        ORDER BY post_comment_image_id
+    </select>
+
+    <!-- 조회 이후 댓글에 연결됐다면 지우지 않는다 -->
+    <delete id="deleteOrphanById">
+        DELETE FROM post_comment_image
+        WHERE post_comment_image_id = #{postCommentImageId} AND post_comment_id IS NULL
+    </delete>
+
+</mapper>

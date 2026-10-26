@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.post.PostMapper">
+
+    <!-- 삭제, 탈퇴한 글도 목록에 자리를 남긴다(내용 가림은 서비스가 한다). 본문은 목록에서 뺀다 -->
+    <select id="selectPage" resultType="PostVO">
+        SELECT p.post_id, p.title, p.view_count, p.status, p.created_at, u.name AS author_name,
+               (SELECT COUNT(*) FROM post_comment c WHERE c.post_id = p.post_id) AS comment_count,
+               (p.user_id = #{userId}) AS mine
+        FROM post p
+        JOIN users u ON u.user_id = p.user_id
+        ORDER BY p.created_at DESC, p.post_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM post
+    </select>
+
+    <select id="selectById" resultType="PostVO">
+        SELECT p.post_id, p.title, p.content, p.view_count, p.status, p.created_at, p.updated_at, u.name AS author_name,
+               (SELECT COUNT(*) FROM post_comment c WHERE c.post_id = p.post_id) AS comment_count,
+               (p.user_id = #{userId}) AS mine
+        FROM post p
+        JOIN users u ON u.user_id = p.user_id
+        WHERE p.post_id = #{postId}
+    </select>
+
+    <!-- 소유자와 상태 확인용 -->
+    <select id="selectOwnerAndStatus" resultType="PostVO">
+        SELECT post_id, user_id, status
+        FROM post
+        WHERE post_id = #{postId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO post (user_id, title, content)
+        VALUES (#{userId}, #{title}, #{content})
+    </insert>
+
+    <!-- 같은 트랜잭션(같은 커넥션)에서 방금 넣은 행의 id -->
+    <select id="selectLastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <!-- 조회수는 updated_at을 바꾸지 않는다(post.updated_at에는 자동 갱신이 없다) -->
+    <update id="increaseViewCount">
+        UPDATE post
+        SET view_count = view_count + 1
+        WHERE post_id = #{postId}
+    </update>
+
+    <update id="update">
+        UPDATE post
+        SET title = #{title}, content = #{content}, updated_at = NOW()
+        WHERE post_id = #{postId} AND user_id = #{userId} AND status = 'NORMAL'
+    </update>
+
+    <!-- 삭제는 행을 지우지 않고 상태만 바꾼다(내용, 이미지는 보관) -->
+    <update id="softDelete">
+        UPDATE post
+        SET status = 'DELETED', deleted_at = NOW()
+        WHERE post_id = #{postId} AND user_id = #{userId} AND status = 'NORMAL'
+    </update>
+
+    <!-- 이미 DELETED인 글은 그대로 DELETED로 남긴다 -->
+    <update id="withdrawByUser">
+        UPDATE post
+        SET status = 'WITHDRAWN'
+        WHERE user_id = #{userId} AND status = 'NORMAL'
+    </update>
+
+</mapper>
