@@ -28,16 +28,17 @@ public interface PostCommentControllerDocs {
 
     @Operation(
             summary = "댓글, 답글 등록 (예: 글에 댓글 달기, 댓글에 답글 달기)",
-            description = "요청 본문: content: 내용 (필수, 1000자 이하 일반 텍스트), parentPostCommentId: 답글일 때만 최상위 댓글 id (답글의 답글도 최상위 댓글 id를 보낸다), "
+            description = "요청 본문: content: 내용 (1000자 이하 일반 텍스트, 이미지가 있으면 생략하거나 빈 값 가능), parentPostCommentId: 답글일 때만 최상위 댓글 id (답글의 답글도 최상위 댓글 id를 보낸다), "
                     + "mentionUserId: 답글일 때만 누구에게 다는 답글인지 (대상 댓글의 userId), postCommentImageIds: 댓글 이미지 업로드로 받은 id 0~2개 (배열 순서가 표시 순서)\n\n"
                     + "응답: 등록된 댓글 한 건 (replies는 빈 배열)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "댓글 예", value = "{\"content\":\"정리 감사합니다\",\"postCommentImageIds\":[31]}"),
+            @ExampleObject(name = "이미지만 있는 댓글 예", value = "{\"postCommentImageIds\":[31]}"),
             @ExampleObject(name = "답글 예", value = "{\"content\":\"도움이 됐다니 다행이에요\",\"parentPostCommentId\":101,\"mentionUserId\":3}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "등록된 댓글 한 건"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "내용 빈 값 또는 길이 초과, 이미지 3개 이상, 부모가 이 글의 최상위 댓글이 아님, 최상위 댓글에 mentionUserId, 없는 mentionUserId"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "내용과 이미지가 모두 없음, 내용 길이 초과, 이미지 3개 이상, 부모가 이 글의 최상위 댓글이 아님, 최상위 댓글에 mentionUserId, 없는 mentionUserId"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "없는 글, 삭제 또는 탈퇴한 글, 없는 부모 댓글, 남의 이미지 id 또는 이미 쓰인 이미지 id")
     })
     ApiResponse<PostCommentVO> create(
@@ -46,14 +47,14 @@ public interface PostCommentControllerDocs {
 
     @Operation(
             summary = "댓글, 답글 수정 (예: 내용, 이미지 고치기)",
-            description = "요청 본문: content: 내용 (필수, 1000자 이하), postCommentImageIds: 수정 후 최종 이미지 id 목록 (최대 2개, 지금 붙은 이미지를 유지하려면 기존 id를 다시 보내고, 생략하거나 빈 배열이면 이미지를 모두 지운다. 목록에 없는 기존 이미지는 연결이 풀려 1일 뒤 자동 정리된다)\n\n"
+            description = "요청 본문: content: 내용 (1000자 이하, 이미지가 남으면 생략하거나 빈 값 가능), postCommentImageIds: 수정 후 최종 이미지 id 목록 (최대 2개, 지금 붙은 이미지를 유지하려면 기존 id를 다시 보내고, 생략하거나 빈 배열이면 이미지를 모두 지운다. 목록에 없는 기존 이미지는 연결이 풀려 1일 뒤 자동 정리된다)\n\n"
                     + "부모(parentPostCommentId)와 멘션(mentionUserId)은 바꿀 수 없다(보내도 무시). 응답: 수정된 댓글 한 건 (replies는 빈 배열)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
             @ExampleObject(name = "수정 예", value = "{\"content\":\"정리 정말 감사합니다\",\"postCommentImageIds\":[31,35]}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "수정된 댓글 한 건"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "내용 빈 값 또는 길이 초과, 이미지 3개 이상"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "내용과 이미지가 모두 없음, 내용 길이 초과, 이미지 3개 이상"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "남의 댓글"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "없는 댓글, 삭제 또는 탈퇴한 댓글, 남의 이미지 id 또는 다른 댓글에 쓰인 이미지 id")
     })

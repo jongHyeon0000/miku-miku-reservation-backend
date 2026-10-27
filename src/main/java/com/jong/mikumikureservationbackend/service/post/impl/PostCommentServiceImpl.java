@@ -68,9 +68,9 @@ public class PostCommentServiceImpl implements PostCommentService {
         checkParentAndMention(postId, request.getParentPostCommentId(), request.getMentionUserId());
 
         List<Long> imageIds = distinct(request.getPostCommentImageIds());
+        String content = normalizeContent(request.getContent(), imageIds);
 
-        postCommentMapper.insert(userId, postId, request.getParentPostCommentId(), request.getMentionUserId(),
-                request.getContent().trim());
+        postCommentMapper.insert(userId, postId, request.getParentPostCommentId(), request.getMentionUserId(), content);
 
         Long postCommentId = postCommentMapper.selectLastInsertId();
 
@@ -85,8 +85,9 @@ public class PostCommentServiceImpl implements PostCommentService {
         checkOwner(userId, postCommentId);
 
         List<Long> imageIds = distinct(request.getPostCommentImageIds());
+        String content = normalizeContent(request.getContent(), imageIds);
 
-        postCommentMapper.update(userId, postCommentId, request.getContent().trim());
+        postCommentMapper.update(userId, postCommentId, content);
         postCommentImageMapper.detachAllByComment(userId, postCommentId);
         attachImageIds(userId, postCommentId, imageIds);
 
@@ -206,6 +207,21 @@ public class PostCommentServiceImpl implements PostCommentService {
         comment.setUpdatedAt(null);
         comment.setMine(null);
         comment.setImages(null);
+    }
+
+    // 내용은 비어도 이미지가 있으면 되고, 빈 내용은 NULL로 통일한다
+    private String normalizeContent(String content, List<Long> imageIds) {
+        String trimmed = content == null ? null : content.trim();
+
+        if (trimmed != null && trimmed.isEmpty()) {
+            trimmed = null;
+        }
+
+        if (trimmed == null && imageIds.isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "내용이나 이미지 중 하나는 있어야 합니다");
+        }
+
+        return trimmed;
     }
 
     private List<Long> distinct(List<Long> ids) {

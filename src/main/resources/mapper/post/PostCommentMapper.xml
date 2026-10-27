@@ -39,7 +39,7 @@
 
     <insert id="insert">
         INSERT INTO post_comment (user_id, post_id, parent_post_comment_id, mention_user_id, content)
-        VALUES (#{userId}, #{postId}, #{parentPostCommentId}, #{mentionUserId}, #{content})
+        VALUES (#{userId}, #{postId}, #{parentPostCommentId}, #{mentionUserId}, #{content,jdbcType=VARCHAR})
     </insert>
 
     <!-- 같은 트랜잭션(같은 커넥션)에서 방금 넣은 행의 id -->
@@ -50,7 +50,7 @@
     <!-- 부모와 멘션은 바꾸지 않는다. post_comment.updated_at에는 자동 갱신이 없어서 직접 갱신한다 -->
     <update id="update">
         UPDATE post_comment
-        SET content = #{content}, updated_at = NOW()
+        SET content = #{content,jdbcType=VARCHAR}, updated_at = NOW()
         WHERE post_comment_id = #{postCommentId} AND user_id = #{userId} AND status = 'NORMAL'
     </update>
 

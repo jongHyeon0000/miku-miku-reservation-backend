@@ -3,7 +3,6 @@ package com.jong.mikumikureservationbackend.vo.post;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jong.mikumikureservationbackend.common.constant.PostStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,8 +43,7 @@ public class PostCommentVO {
     private Long mentionUserId;
 
     /** 내용 (일반 텍스트, 멘션 글자는 넣지 않음) */
-    @Schema(description = "내용 (일반 텍스트, 1000자 이하). 멘션 글자(@이름)는 넣지 않는다", example = "정리 감사합니다", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank
+    @Schema(description = "내용 (일반 텍스트, 1000자 이하, 이미지가 있으면 생략 가능). 멘션 글자(@이름)는 넣지 않는다", example = "정리 감사합니다")
     @Size(max = 1000)
     private String content;
 
