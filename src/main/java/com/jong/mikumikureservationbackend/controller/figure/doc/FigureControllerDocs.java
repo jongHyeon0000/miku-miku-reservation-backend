@@ -2,6 +2,7 @@ package com.jong.mikumikureservationbackend.controller.figure.doc;
 
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.vo.figure.response.FigureResponseVO;
+import com.jong.mikumikureservationbackend.vo.figure.request.FigureDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.figure.request.FigureSaveRequestVO;
 import com.jong.mikumikureservationbackend.vo.figure.request.FigureStatusRequestVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -128,12 +129,15 @@ public interface FigureControllerDocs {
 
     @Operation(
             summary = "상품 일괄 삭제, 전부 성공 또는 전부 실패 (예: 선택한 상품 모두 삭제)",
-            description = "하나라도 없는 상품이면 아무것도 삭제하지 않고 404다. 성공하면 `data` 없이 `code: OK`만 돌려준다.")
+            description = "`figureIds`를 JSON 본문으로 받는다(쿼리로 보내지 않는다. id가 많으면 URL 길이 제한을 넘기 때문이다). "
+                    + "하나라도 없는 상품이면 아무것도 삭제하지 않고 404다. 성공하면 `data` 없이 `code: OK`만 돌려준다. 상품의 썸네일 행과 파일도 함께 정리한다.")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "상품 3개 삭제", value = "{\"figureIds\":[1,2,3]}")
+    }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "figureIds 누락"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "figureIds 누락 또는 빈 배열, 본문을 읽을 수 없음(숫자가 아닌 값, JSON 형식 오류)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "하나라도 없는 상품(아무것도 삭제하지 않음)")
     })
-    ApiResponse<Void> deleteAll(
-            @Parameter(description = "삭제할 상품 id 목록 (쉼표로 구분)", example = "1,2,3", required = true) List<Long> figureIds);
+    ApiResponse<Void> deleteAll(FigureDeleteRequestVO request);
 }

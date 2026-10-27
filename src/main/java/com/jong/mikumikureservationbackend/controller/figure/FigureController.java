@@ -6,6 +6,7 @@ import com.jong.mikumikureservationbackend.controller.figure.doc.FigureControlle
 import com.jong.mikumikureservationbackend.service.figure.FigureService;
 import com.jong.mikumikureservationbackend.service.figure.FigureStatusService;
 import com.jong.mikumikureservationbackend.vo.figure.response.FigureResponseVO;
+import com.jong.mikumikureservationbackend.vo.figure.request.FigureDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.figure.request.FigureSaveRequestVO;
 import com.jong.mikumikureservationbackend.vo.figure.request.FigureStatusRequestVO;
 import jakarta.validation.Valid;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
@@ -83,9 +83,8 @@ public class FigureController implements FigureControllerDocs {
 
     @Override
     @DeleteMapping
-    public ApiResponse<Void> deleteAll(
-            @RequestParam List<Long> figureIds) {
-        figureService.deleteAll(currentUser.getId(), figureIds);
+    public ApiResponse<Void> deleteAll(@RequestBody FigureDeleteRequestVO request) {
+        figureService.deleteAll(currentUser.getId(), request.getFigureIds());
 
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }
