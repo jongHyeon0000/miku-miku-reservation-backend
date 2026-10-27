@@ -6,6 +6,7 @@ import com.jong.mikumikureservationbackend.controller.series.doc.SeriesControlle
 import com.jong.mikumikureservationbackend.service.series.SeriesService;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.series.SeriesDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,14 @@ public class SeriesController implements SeriesControllerDocs {
     public ApiResponse<Void> delete(
             @PathVariable Long seriesId) {
         seriesService.delete(currentUser.getId(), seriesId);
+
+        return ApiResponse.ok("삭제가 완료되었습니다.");
+    }
+
+    @Override
+    @DeleteMapping
+    public ApiResponse<Void> deleteAll(@RequestBody SeriesDeleteRequestVO request) {
+        seriesService.deleteAll(currentUser.getId(), request.getSeriesIds());
 
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }

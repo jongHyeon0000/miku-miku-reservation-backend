@@ -6,6 +6,7 @@ import com.jong.mikumikureservationbackend.controller.type.doc.FigureTypeControl
 import com.jong.mikumikureservationbackend.service.type.FigureTypeService;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.type.FigureTypeDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.type.FigureTypeVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,14 @@ public class FigureTypeController implements FigureTypeControllerDocs {
     public ApiResponse<Void> delete(
             @PathVariable Long figureTypeId) {
         figureTypeService.delete(currentUser.getId(), figureTypeId);
+
+        return ApiResponse.ok("삭제가 완료되었습니다.");
+    }
+
+    @Override
+    @DeleteMapping
+    public ApiResponse<Void> deleteAll(@RequestBody FigureTypeDeleteRequestVO request) {
+        figureTypeService.deleteAll(currentUser.getId(), request.getFigureTypeIds());
 
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }

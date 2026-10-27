@@ -112,4 +112,53 @@
         WHERE user_id = #{userId} AND series_id = #{seriesId}
     </delete>
 
+    <select id="selectByIds" resultType="SeriesVO">
+        SELECT e.series_id AS id, e.user_id, e.series_group_id AS group_id, e.name
+        FROM series e
+        WHERE e.user_id = #{userId}
+          AND e.series_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM series
+        WHERE user_id = #{userId}
+          AND series_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 1단계: 선택한 항목만 가지고 있던 상품에 기본 항목을 연결한다. 선택하지 않은 다른 항목이 남은 상품에는 추가하지 않는다 -->
+    <insert id="moveInsertFallbackByIds">
+        INSERT INTO figure_series_map (user_id, figure_id, series_id)
+        SELECT DISTINCT l.user_id, l.figure_id, #{fallbackId}
+        FROM figure_series_map l
+        WHERE l.user_id = #{userId}
+          AND l.series_id IN
+          <foreach collection="ids" item="id" open="(" separator="," close=")">
+              #{id}
+          </foreach>
+          AND NOT EXISTS (
+              SELECT 1 FROM figure_series_map o
+              WHERE o.user_id = l.user_id AND o.figure_id = l.figure_id
+                AND o.series_id NOT IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+          )
+    </insert>
+
+    <!-- 2단계: 선택한 항목에 대한 연결을 지운다 -->
+    <delete id="moveDeleteLinksByIds">
+        DELETE FROM figure_series_map
+        WHERE user_id = #{userId}
+          AND series_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

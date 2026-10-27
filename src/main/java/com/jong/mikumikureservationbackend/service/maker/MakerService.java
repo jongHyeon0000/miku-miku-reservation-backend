@@ -20,4 +20,7 @@ public interface MakerService {
     void delete(Long userId, Long makerId);
 
     UsageResponseVO getUsage(Long userId, Long makerId);
+
+    /* 하나라도 없으면 전체를 되돌린다. 쓰던 상품을 기본 항목(기타)으로 옮긴 뒤 삭제한다 */
+    void deleteAll(Long userId, List<Long> makerIds);
 }

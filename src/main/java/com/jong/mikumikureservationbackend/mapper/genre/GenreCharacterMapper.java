@@ -37,4 +37,12 @@ public interface GenreCharacterMapper {
     int moveInsertFallback(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId, @Param("fallbackId") Long fallbackId);
 
     int moveDeleteLinks(@Param("userId") Long userId, @Param("genreCharacterId") Long genreCharacterId);
+
+    List<GenreCharacterVO> selectByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
+
+    int deleteByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
+
+    int moveInsertFallbackByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids, @Param("fallbackId") Long fallbackId);
+
+    int moveDeleteLinksByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
 }

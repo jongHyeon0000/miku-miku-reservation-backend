@@ -6,6 +6,7 @@ import com.jong.mikumikureservationbackend.controller.genre.doc.GenreCharacterCo
 import com.jong.mikumikureservationbackend.service.genre.GenreCharacterService;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.genre.GenreCharacterVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,14 @@ public class GenreCharacterController implements GenreCharacterControllerDocs {
     public ApiResponse<Void> delete(
             @PathVariable Long genreCharacterId) {
         genreCharacterService.delete(currentUser.getId(), genreCharacterId);
+
+        return ApiResponse.ok("삭제가 완료되었습니다.");
+    }
+
+    @Override
+    @DeleteMapping
+    public ApiResponse<Void> deleteAll(@RequestBody GenreCharacterDeleteRequestVO request) {
+        genreCharacterService.deleteAll(currentUser.getId(), request.getGenreCharacterIds());
 
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }

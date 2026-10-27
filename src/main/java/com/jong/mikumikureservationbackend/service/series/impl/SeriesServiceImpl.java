@@ -16,8 +16,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -105,10 +109,59 @@ public class SeriesServiceImpl implements SeriesService {
     }
 
     @Override
+    @Transactional
+    public void deleteAll(Long userId, List<Long> seriesIds) {
+        List<Long> distinctIds = distinct(seriesIds);
+
+        if (distinctIds.isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 시리즈 id가 필요합니다");
+        }
+
+        List<SeriesVO> items = seriesMapper.selectByIds(userId, distinctIds);
+
+        if (items.size() != distinctIds.size()) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+
+        Map<Long, Integer> selectedCounts = new HashMap<>();
+
+        for (SeriesVO item : items) {
+            if (CategoryConstant.DEFAULT_NAME.equals(item.getName())) {
+                throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
+            }
+            selectedCounts.merge(item.getGroupId(), 1, Integer::sum);
+        }
+        for (Map.Entry<Long, Integer> entry : selectedCounts.entrySet()) {
+            if (seriesMapper.countByParent(userId, entry.getKey()) - entry.getValue() <= 0) {
+                throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
+            }
+        }
+
+        Long fallbackId = seriesMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
+        if (fallbackId == null) {
+            throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
+        }
+
+        seriesMapper.moveInsertFallbackByIds(userId, distinctIds, fallbackId);
+        seriesMapper.moveDeleteLinksByIds(userId, distinctIds);
+        seriesMapper.deleteByIds(userId, distinctIds);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SERIES, distinctIds);
+    }
+
+    @Override
     public UsageResponseVO getUsage(Long userId, Long seriesId) {
         find(userId, seriesId);
 
         return new UsageResponseVO(seriesMapper.countUsage(userId, seriesId));
+    }
+
+    private List<Long> distinct(List<Long> seriesIds) {
+        if (seriesIds == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(new LinkedHashSet<>(seriesIds));
     }
 
     private SeriesVO find(Long userId, Long seriesId) {

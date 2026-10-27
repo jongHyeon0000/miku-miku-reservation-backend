@@ -35,4 +35,10 @@ public interface ShopMapper {
     int countUsage(@Param("userId") Long userId, @Param("shopId") Long shopId);
 
     int moveUsage(@Param("userId") Long userId, @Param("shopId") Long shopId, @Param("fallbackId") Long fallbackId);
+
+    List<ShopVO> selectByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
+
+    int deleteByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids);
+
+    int moveUsageByIds(@Param("userId") Long userId, @Param("ids") List<Long> ids, @Param("fallbackId") Long fallbackId);
 }

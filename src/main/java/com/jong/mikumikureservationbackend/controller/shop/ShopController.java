@@ -6,6 +6,7 @@ import com.jong.mikumikureservationbackend.controller.shop.doc.ShopControllerDoc
 import com.jong.mikumikureservationbackend.service.shop.ShopService;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.shop.ShopDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.shop.ShopVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,14 @@ public class ShopController implements ShopControllerDocs {
     public ApiResponse<Void> delete(
             @PathVariable Long shopId) {
         shopService.delete(currentUser.getId(), shopId);
+
+        return ApiResponse.ok("삭제가 완료되었습니다.");
+    }
+
+    @Override
+    @DeleteMapping
+    public ApiResponse<Void> deleteAll(@RequestBody ShopDeleteRequestVO request) {
+        shopService.deleteAll(currentUser.getId(), request.getShopIds());
 
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }

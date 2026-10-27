@@ -16,8 +16,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -104,10 +108,58 @@ public class FigureTypeServiceImpl implements FigureTypeService {
     }
 
     @Override
+    @Transactional
+    public void deleteAll(Long userId, List<Long> figureTypeIds) {
+        List<Long> distinctIds = distinct(figureTypeIds);
+
+        if (distinctIds.isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 형태 id가 필요합니다");
+        }
+
+        List<FigureTypeVO> items = figureTypeMapper.selectByIds(userId, distinctIds);
+
+        if (items.size() != distinctIds.size()) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+
+        Map<Long, Integer> selectedCounts = new HashMap<>();
+
+        for (FigureTypeVO item : items) {
+            if (CategoryConstant.DEFAULT_NAME.equals(item.getName())) {
+                throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
+            }
+            selectedCounts.merge(item.getGroupId(), 1, Integer::sum);
+        }
+        for (Map.Entry<Long, Integer> entry : selectedCounts.entrySet()) {
+            if (figureTypeMapper.countByParent(userId, entry.getKey()) - entry.getValue() <= 0) {
+                throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
+            }
+        }
+
+        Long fallbackId = figureTypeMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
+        if (fallbackId == null) {
+            throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
+        }
+
+        figureTypeMapper.moveUsageByIds(userId, distinctIds, fallbackId);
+        figureTypeMapper.deleteByIds(userId, distinctIds);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.FIGURE_TYPE, distinctIds);
+    }
+
+    @Override
     public UsageResponseVO getUsage(Long userId, Long figureTypeId) {
         find(userId, figureTypeId);
 
         return new UsageResponseVO(figureTypeMapper.countUsage(userId, figureTypeId));
+    }
+
+    private List<Long> distinct(List<Long> figureTypeIds) {
+        if (figureTypeIds == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(new LinkedHashSet<>(figureTypeIds));
     }
 
     private FigureTypeVO find(Long userId, Long figureTypeId) {

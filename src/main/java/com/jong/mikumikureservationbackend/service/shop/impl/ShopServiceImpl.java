@@ -16,8 +16,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -104,10 +108,58 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
+    @Transactional
+    public void deleteAll(Long userId, List<Long> shopIds) {
+        List<Long> distinctIds = distinct(shopIds);
+
+        if (distinctIds.isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 판매처 id가 필요합니다");
+        }
+
+        List<ShopVO> items = shopMapper.selectByIds(userId, distinctIds);
+
+        if (items.size() != distinctIds.size()) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+
+        Map<Long, Integer> selectedCounts = new HashMap<>();
+
+        for (ShopVO item : items) {
+            if (CategoryConstant.DEFAULT_NAME.equals(item.getName())) {
+                throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
+            }
+            selectedCounts.merge(item.getGroupId(), 1, Integer::sum);
+        }
+        for (Map.Entry<Long, Integer> entry : selectedCounts.entrySet()) {
+            if (shopMapper.countByParent(userId, entry.getKey()) - entry.getValue() <= 0) {
+                throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
+            }
+        }
+
+        Long fallbackId = shopMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
+        if (fallbackId == null) {
+            throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
+        }
+
+        shopMapper.moveUsageByIds(userId, distinctIds, fallbackId);
+        shopMapper.deleteByIds(userId, distinctIds);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.SHOP, distinctIds);
+    }
+
+    @Override
     public UsageResponseVO getUsage(Long userId, Long shopId) {
         find(userId, shopId);
 
         return new UsageResponseVO(shopMapper.countUsage(userId, shopId));
+    }
+
+    private List<Long> distinct(List<Long> shopIds) {
+        if (shopIds == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(new LinkedHashSet<>(shopIds));
     }
 
     private ShopVO find(Long userId, Long shopId) {

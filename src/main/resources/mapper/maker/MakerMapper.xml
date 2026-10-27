@@ -78,4 +78,33 @@
         WHERE user_id = #{userId} AND maker_id = #{makerId}
     </update>
 
+    <select id="selectByIds" resultType="MakerVO">
+        SELECT e.maker_id AS id, e.user_id, e.name
+        FROM maker e
+        WHERE e.user_id = #{userId}
+          AND e.maker_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM maker
+        WHERE user_id = #{userId}
+          AND maker_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 선택한 항목을 쓰던 상품을 기본 항목으로 바꾼다 -->
+    <update id="moveUsageByIds">
+        UPDATE figure SET maker_id = #{fallbackId}
+        WHERE user_id = #{userId}
+          AND maker_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
 </mapper>

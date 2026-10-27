@@ -3,6 +3,7 @@ package com.jong.mikumikureservationbackend.controller.series.doc;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.series.SeriesDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.series.SeriesVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,6 +71,21 @@ public interface SeriesControllerDocs {
     })
     ApiResponse<Void> delete(
             @Parameter(description = "삭제할 시리즈 id", example = "1") Long seriesId);
+
+    @Operation(
+            summary = "시리즈 일괄 삭제, 전부 성공 또는 전부 실패 (예: 보컬로이드)",
+            description = "`seriesIds`를 JSON 본문으로 받는다. 선택한 항목만 가지고 있던 상품에는 '기타'를 연결하고 연결을 지운 뒤 삭제한다(다른 항목이 남은 상품은 그대로). "
+                    + "하나라도 없거나 다른 사용자의 시리즈이면 아무것도 삭제하지 않고 404다. `기타`가 하나라도 있으면 400이다. 한 그룹의 하위를 전부 지우려 하면(마지막 하위 보호) 400이다. "
+                    + "성공하면 `data` 없이 `code: OK`만 돌려준다. 썸네일 행과 파일도 함께 정리한다.")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "시리즈 3개 삭제", value = "{\"seriesIds\":[1,2,3]}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "seriesIds 누락 또는 빈 배열, 본문을 읽을 수 없음(숫자가 아닌 값, JSON 형식 오류), 기타 포함, 한 그룹의 하위 전체 삭제(마지막 하위 보호)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "하나라도 없는 시리즈(아무것도 삭제하지 않음)")
+    })
+    ApiResponse<Void> deleteAll(SeriesDeleteRequestVO request);
 
     @Operation(
             summary = "시리즈 삭제 전 영향 상품 수 조회 (예: 팝업퍼레이드)",

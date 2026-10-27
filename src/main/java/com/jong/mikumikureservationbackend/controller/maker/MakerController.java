@@ -6,6 +6,7 @@ import com.jong.mikumikureservationbackend.controller.maker.doc.MakerControllerD
 import com.jong.mikumikureservationbackend.service.maker.MakerService;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.maker.MakerDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,14 @@ public class MakerController implements MakerControllerDocs {
     public ApiResponse<Void> delete(
             @PathVariable Long makerId) {
         makerService.delete(currentUser.getId(), makerId);
+
+        return ApiResponse.ok("삭제가 완료되었습니다.");
+    }
+
+    @Override
+    @DeleteMapping
+    public ApiResponse<Void> deleteAll(@RequestBody MakerDeleteRequestVO request) {
+        makerService.deleteAll(currentUser.getId(), request.getMakerIds());
 
         return ApiResponse.ok("삭제가 완료되었습니다.");
     }

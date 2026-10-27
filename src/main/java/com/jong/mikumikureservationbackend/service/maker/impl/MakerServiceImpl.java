@@ -15,8 +15,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
@@ -101,10 +103,50 @@ public class MakerServiceImpl implements MakerService {
     }
 
     @Override
+    @Transactional
+    public void deleteAll(Long userId, List<Long> makerIds) {
+        List<Long> distinctIds = distinct(makerIds);
+
+        if (distinctIds.isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 제조사 id가 필요합니다");
+        }
+
+        List<MakerVO> items = makerMapper.selectByIds(userId, distinctIds);
+
+        if (items.size() != distinctIds.size()) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+
+        for (MakerVO item : items) {
+            if (CategoryConstant.DEFAULT_NAME.equals(item.getName())) {
+                throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
+            }
+        }
+
+        Long fallbackId = makerMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
+        if (fallbackId == null) {
+            throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
+        }
+
+        makerMapper.moveUsageByIds(userId, distinctIds, fallbackId);
+        makerMapper.deleteByIds(userId, distinctIds);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.MAKER, distinctIds);
+    }
+
+    @Override
     public UsageResponseVO getUsage(Long userId, Long makerId) {
         find(userId, makerId);
 
         return new UsageResponseVO(makerMapper.countUsage(userId, makerId));
+    }
+
+    private List<Long> distinct(List<Long> makerIds) {
+        if (makerIds == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(new LinkedHashSet<>(makerIds));
     }
 
     private MakerVO find(Long userId, Long makerId) {

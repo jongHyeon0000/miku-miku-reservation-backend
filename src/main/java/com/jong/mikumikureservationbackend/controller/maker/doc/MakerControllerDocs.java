@@ -3,6 +3,7 @@ package com.jong.mikumikureservationbackend.controller.maker.doc;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.common.UsageResponseVO;
+import com.jong.mikumikureservationbackend.vo.maker.MakerDeleteRequestVO;
 import com.jong.mikumikureservationbackend.vo.maker.MakerVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -68,6 +69,21 @@ public interface MakerControllerDocs {
     })
     ApiResponse<Void> delete(
             @Parameter(description = "삭제할 제조사 id", example = "1") Long makerId);
+
+    @Operation(
+            summary = "제조사 일괄 삭제, 전부 성공 또는 전부 실패 (예: 세가, 후류)",
+            description = "`makerIds`를 JSON 본문으로 받는다. 쓰던 상품은 '기타'로 옮긴 뒤 삭제한다. "
+                    + "하나라도 없거나 다른 사용자의 제조사이면 아무것도 삭제하지 않고 404다. `기타`가 하나라도 있으면 400이다. "
+                    + "성공하면 `data` 없이 `code: OK`만 돌려준다. 썸네일 행과 파일도 함께 정리한다.")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "제조사 3개 삭제", value = "{\"makerIds\":[1,2,3]}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공 시 data 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "makerIds 누락 또는 빈 배열, 본문을 읽을 수 없음(숫자가 아닌 값, JSON 형식 오류), 기타 포함"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "하나라도 없는 제조사(아무것도 삭제하지 않음)")
+    })
+    ApiResponse<Void> deleteAll(MakerDeleteRequestVO request);
 
     @Operation(
             summary = "제조사 삭제 전 영향 상품 수 조회 (예: 세가, 후류)",

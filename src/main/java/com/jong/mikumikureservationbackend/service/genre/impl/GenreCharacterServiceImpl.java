@@ -16,8 +16,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -105,10 +109,59 @@ public class GenreCharacterServiceImpl implements GenreCharacterService {
     }
 
     @Override
+    @Transactional
+    public void deleteAll(Long userId, List<Long> genreCharacterIds) {
+        List<Long> distinctIds = distinct(genreCharacterIds);
+
+        if (distinctIds.isEmpty()) {
+            throw new BusinessException(GlobalExceptionCode.BAD_REQUEST, "삭제할 캐릭터 id가 필요합니다");
+        }
+
+        List<GenreCharacterVO> items = genreCharacterMapper.selectByIds(userId, distinctIds);
+
+        if (items.size() != distinctIds.size()) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+
+        Map<Long, Integer> selectedCounts = new HashMap<>();
+
+        for (GenreCharacterVO item : items) {
+            if (CategoryConstant.DEFAULT_NAME.equals(item.getName())) {
+                throw new BusinessException(GlobalExceptionCode.PROTECTED_CATEGORY);
+            }
+            selectedCounts.merge(item.getGroupId(), 1, Integer::sum);
+        }
+        for (Map.Entry<Long, Integer> entry : selectedCounts.entrySet()) {
+            if (genreCharacterMapper.countByParent(userId, entry.getKey()) - entry.getValue() <= 0) {
+                throw new BusinessException(GlobalExceptionCode.LAST_CHILD_CATEGORY);
+            }
+        }
+
+        Long fallbackId = genreCharacterMapper.selectDefaultId(userId, CategoryConstant.DEFAULT_NAME);
+
+        if (fallbackId == null) {
+            throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
+        }
+
+        genreCharacterMapper.moveInsertFallbackByIds(userId, distinctIds, fallbackId);
+        genreCharacterMapper.moveDeleteLinksByIds(userId, distinctIds);
+        genreCharacterMapper.deleteByIds(userId, distinctIds);
+        thumbnailImageService.deleteByTargets(userId, ThumbnailTarget.GENRE_CHARACTER, distinctIds);
+    }
+
+    @Override
     public UsageResponseVO getUsage(Long userId, Long genreCharacterId) {
         find(userId, genreCharacterId);
 
         return new UsageResponseVO(genreCharacterMapper.countUsage(userId, genreCharacterId));
+    }
+
+    private List<Long> distinct(List<Long> genreCharacterIds) {
+        if (genreCharacterIds == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(new LinkedHashSet<>(genreCharacterIds));
     }
 
     private GenreCharacterVO find(Long userId, Long genreCharacterId) {
