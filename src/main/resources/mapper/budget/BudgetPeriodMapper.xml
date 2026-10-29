@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.budget.BudgetPeriodMapper">
+
+    <select id="selectByDate" resultType="BudgetPeriodVO">
+        SELECT budget_period_id, start_date, end_date, amount
+        FROM budget_period
+        WHERE user_id = #{userId}
+          AND start_date &lt;= #{date}
+          AND end_date &gt;= #{date}
+    </select>
+
+    <select id="selectLastEndDate" resultType="java.time.LocalDate">
+        SELECT MAX(end_date)
+        FROM budget_period
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO budget_period (user_id, start_date, end_date, amount)
+        VALUES (#{userId}, #{startDate}, #{endDate}, #{amount})
+    </insert>
+
+    <select id="selectEndedTargets" resultType="BudgetPeriodTargetVO">
+        SELECT u.user_id, u.budget_start_day, u.default_budget, MAX(p.end_date) AS last_end_date
+        FROM users u
+        JOIN budget_period p ON p.user_id = u.user_id
+        WHERE u.budget_enabled = 1
+          AND u.status = 'ACTIVE'
+        GROUP BY u.user_id, u.budget_start_day, u.default_budget
+        HAVING MAX(p.end_date) &lt; #{today}
+    </select>
+
+    <!--
+        지출 = 상품의 결제 한 번마다 한 줄. 결제일이 기간 안에 있는 것만 센다.
+        예약금형은 예약금(deposit_paid_at)과 잔금(paid_at)이 각각 다른 줄이 된다.
+        잔금은 (가격 x 수량 - 낸 예약금)이며 UNSIGNED 뺄셈 오류를 피하려고 SIGNED로 바꿔 0 미만이면 0으로 둔다.
+    -->
+    <select id="selectSpendings" resultType="BudgetSpendingVO">
+        SELECT figure_id, figure_name, kind, paid_date, amount
+        FROM (
+            SELECT f.figure_id AS figure_id, f.name AS figure_name, 'DEPOSIT' AS kind,
+                   f.deposit_paid_at AS paid_date, f.deposit_amount AS amount
+            FROM figure f
+            WHERE f.user_id = #{userId}
+              AND f.payment_type = 'DEPOSIT'
+              AND f.deposit_paid_at BETWEEN #{startDate} AND #{endDate}
+            UNION ALL
+            SELECT f.figure_id, f.name, 'FULL', f.paid_at, f.price * f.quantity
+            FROM figure f
+            WHERE f.user_id = #{userId}
+              AND f.payment_type = 'FULL'
+              AND f.paid_at BETWEEN #{startDate} AND #{endDate}
+            UNION ALL
+            SELECT f.figure_id, f.name, 'BALANCE', f.paid_at,
+                   GREATEST(CAST(f.price * f.quantity AS SIGNED) - CAST(f.deposit_amount AS SIGNED), 0)
+            FROM figure f
+            WHERE f.user_id = #{userId}
+              AND f.payment_type = 'DEPOSIT'
+              AND f.paid_at BETWEEN #{startDate} AND #{endDate}
+        ) spending
+        ORDER BY paid_date DESC, figure_id DESC
+    </select>
+
+    <select id="selectFiguresForCheck" resultType="FigureVO">
+        SELECT figure_id, status, price, quantity, deposit_amount
+        FROM figure
+        WHERE user_id = #{userId}
+          AND figure_id IN
+        <foreach collection="figureIds" item="figureId" open="(" separator="," close=")">
+            #{figureId}
+        </foreach>
+    </select>
+
+</mapper>

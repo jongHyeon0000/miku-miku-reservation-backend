@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jong.mikumikureservationbackend.mapper.budget.BudgetAdjustMapper">
+
+    <select id="selectByPeriod" resultType="BudgetAdjustVO">
+        SELECT budget_adjust_id, budget_period_id, amount, memo, created_at, updated_at
+        FROM budget_adjust
+        WHERE user_id = #{userId}
+          AND budget_period_id = #{budgetPeriodId}
+        ORDER BY created_at DESC, budget_adjust_id DESC
+    </select>
+
+    <select id="selectSumByPeriod" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(amount), 0)
+        FROM budget_adjust
+        WHERE user_id = #{userId}
+          AND budget_period_id = #{budgetPeriodId}
+    </select>
+
+    <select id="selectById" resultType="BudgetAdjustVO">
+        SELECT budget_adjust_id, budget_period_id, amount, memo, created_at, updated_at
+        FROM budget_adjust
+        WHERE user_id = #{userId}
+          AND budget_adjust_id = #{budgetAdjustId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO budget_adjust (user_id, budget_period_id, amount, memo)
+        VALUES (#{userId}, #{budgetPeriodId}, #{amount}, #{memo,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update">
+        UPDATE budget_adjust
+        SET amount = #{amount}, memo = #{memo,jdbcType=VARCHAR}
+        WHERE user_id = #{userId}
+          AND budget_adjust_id = #{budgetAdjustId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM budget_adjust
+        WHERE user_id = #{userId}
+          AND budget_adjust_id = #{budgetAdjustId}
+    </delete>
+
+</mapper>
