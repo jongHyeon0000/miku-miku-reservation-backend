@@ -14,6 +14,8 @@ public interface TemplateMakerMapper {
 
     List<TemplateSkippedItemVO> selectSkipped(@Param("userId") Long userId, @Param("templateId") Long templateId);
 
+    List<TemplateSkippedItemVO> selectAdded(@Param("userId") Long userId, @Param("templateId") Long templateId);
+
     long selectMaxItemId(@Param("userId") Long userId);
 
     int insertItems(@Param("userId") Long userId, @Param("templateId") Long templateId);

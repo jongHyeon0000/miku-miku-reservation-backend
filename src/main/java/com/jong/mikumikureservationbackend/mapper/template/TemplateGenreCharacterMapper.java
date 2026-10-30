@@ -14,6 +14,8 @@ public interface TemplateGenreCharacterMapper {
 
     List<TemplateSkippedItemVO> selectSkipped(@Param("userId") Long userId, @Param("templateId") Long templateId);
 
+    List<TemplateSkippedItemVO> selectAdded(@Param("userId") Long userId, @Param("templateId") Long templateId);
+
     long selectMaxGroupId(@Param("userId") Long userId);
 
     long selectMaxItemId(@Param("userId") Long userId);

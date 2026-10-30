@@ -15,6 +15,22 @@
           )
     </select>
 
+    <!-- 가져오면 새로 추가될 항목 (selectAddCount와 같은 조건) -->
+    <select id="selectAdded" resultType="TemplateSkippedItemVO">
+        SELECT g.name AS group_name, i.name AS name, i.description AS description,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM template_figure_type i
+        JOIN template_figure_type_group g ON g.template_figure_type_group_id = i.template_figure_type_group_id
+        LEFT JOIN thumbnail_image t ON t.target_type = 'TEMPLATE_FIGURE_TYPE' AND t.target_id = i.template_figure_type_id
+        WHERE g.template_id = #{templateId}
+          AND NOT EXISTS (
+              SELECT 1 FROM figure_type_group e
+              JOIN figure_type c ON c.user_id = e.user_id AND c.figure_type_group_id = e.figure_type_group_id
+              WHERE e.user_id = #{userId} AND e.name = g.name AND c.name = i.name
+          )
+        ORDER BY g.template_figure_type_group_id, i.template_figure_type_id
+    </select>
+
     <!-- 이미 있어서 제외될 항목 -->
     <select id="selectSkipped" resultType="TemplateSkippedItemVO">
         SELECT g.name AS group_name, i.name AS name, i.description AS description,

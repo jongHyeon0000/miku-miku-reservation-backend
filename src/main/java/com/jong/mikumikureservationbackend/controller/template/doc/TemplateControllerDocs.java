@@ -32,10 +32,11 @@ public interface TemplateControllerDocs {
             summary = "템플릿 가져오기 미리보기, DB 변경 없음 (예: 동방프로젝트)",
             description = "가져오기 전에 확인창을 띄우려고 쓴다.\n\n"
                     + "응답: templateId, name, addCount(새로 추가될 하위 항목 수), skippedCount(제외될 수), "
+                    + "added(새로 추가될 항목, skipped와 같은 모양, 없으면 빈 배열), "
                     + "skipped(제외될 항목을 상위 그룹별로 묶음: groupName, items[{name, description, thumbnailUrl}]. 설명, 이미지는 템플릿의 값이고 없으면 생략. 제조사는 상위가 없어 groupName 생략, 제외 항목이 없으면 빈 배열)\n\n"
                     + "제외 기준: 내 분류에서 같은 상위 안에 같은 이름이 이미 있는 항목 (등록할 때 '이미 같은 이름이 있습니다'로 막히는 기준과 같다)")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "addCount, skippedCount, skipped"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "addCount, skippedCount, added, skipped"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "없는 템플릿")
     })

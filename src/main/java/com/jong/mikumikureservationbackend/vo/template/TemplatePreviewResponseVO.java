@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@Schema(description = "가져오기 미리보기: 가져오면 추가될 수와 이미 있어 제외될 항목")
+@Schema(description = "가져오기 미리보기: 가져오면 추가될 항목과 이미 있어 제외될 항목")
 @Getter
 @RequiredArgsConstructor
 public class TemplatePreviewResponseVO {
@@ -22,6 +22,9 @@ public class TemplatePreviewResponseVO {
 
     @Schema(description = "이미 있어서 제외될 항목 수 (skipped의 모든 이름 합계)", example = "3")
     private final int skippedCount;
+
+    @Schema(description = "가져오면 새로 추가될 항목 (skipped와 같은 모양). 추가될 항목이 없으면 빈 배열")
+    private final List<TemplateSkippedGroupVO> added;
 
     @Schema(description = "제외될 항목. 제외 항목이 없으면 빈 배열")
     private final List<TemplateSkippedGroupVO> skipped;

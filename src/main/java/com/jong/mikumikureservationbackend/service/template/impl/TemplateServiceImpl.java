@@ -47,34 +47,40 @@ public class TemplateServiceImpl implements TemplateService {
     public TemplatePreviewResponseVO preview(Long userId, Long templateId) {
         TemplateVO template = find(templateId);
         int addCount;
+        List<TemplateSkippedItemVO> added;
         List<TemplateSkippedItemVO> skipped;
 
         switch (template.getTemplateType()) {
             case SHOP:
                 addCount = templateShopMapper.selectAddCount(userId, templateId);
+                added = templateShopMapper.selectAdded(userId, templateId);
                 skipped = templateShopMapper.selectSkipped(userId, templateId);
                 break;
             case FIGURE_TYPE:
                 addCount = templateFigureTypeMapper.selectAddCount(userId, templateId);
+                added = templateFigureTypeMapper.selectAdded(userId, templateId);
                 skipped = templateFigureTypeMapper.selectSkipped(userId, templateId);
                 break;
             case SERIES:
                 addCount = templateSeriesMapper.selectAddCount(userId, templateId);
+                added = templateSeriesMapper.selectAdded(userId, templateId);
                 skipped = templateSeriesMapper.selectSkipped(userId, templateId);
                 break;
             case GENRE_CHARACTER:
                 addCount = templateGenreCharacterMapper.selectAddCount(userId, templateId);
+                added = templateGenreCharacterMapper.selectAdded(userId, templateId);
                 skipped = templateGenreCharacterMapper.selectSkipped(userId, templateId);
                 break;
             case MAKER:
                 addCount = templateMakerMapper.selectAddCount(userId, templateId);
+                added = templateMakerMapper.selectAdded(userId, templateId);
                 skipped = templateMakerMapper.selectSkipped(userId, templateId);
                 break;
             default:
                 throw new BusinessException(GlobalExceptionCode.INTERNAL_ERROR);
         }
 
-        return new TemplatePreviewResponseVO(templateId, template.getName(), addCount, skipped.size(), groupSkipped(skipped));
+        return new TemplatePreviewResponseVO(templateId, template.getName(), addCount, skipped.size(), groupItems(added), groupItems(skipped));
     }
 
     @Override
@@ -184,11 +190,11 @@ public class TemplateServiceImpl implements TemplateService {
         return template;
     }
 
-    /* 제외 항목을 상위 그룹 이름별로 묶는다 (조회 순서 유지, 제조사는 상위가 없어 groupName이 null 하나로 묶인다) */
-    private List<TemplateSkippedGroupVO> groupSkipped(List<TemplateSkippedItemVO> skipped) {
+    /* 추가, 제외 항목을 상위 그룹 이름별로 묶는다 (조회 순서 유지, 제조사는 상위가 없어 groupName이 null 하나로 묶인다) */
+    private List<TemplateSkippedGroupVO> groupItems(List<TemplateSkippedItemVO> rows) {
         Map<String, List<TemplateSkippedItemResponseVO>> grouped = new LinkedHashMap<>();
 
-        for (TemplateSkippedItemVO row : skipped) {
+        for (TemplateSkippedItemVO row : rows) {
             List<TemplateSkippedItemResponseVO> items = grouped.get(row.getGroupName());
 
             if (items == null) {
