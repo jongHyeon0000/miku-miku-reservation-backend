@@ -2,6 +2,7 @@ package com.jong.mikumikureservationbackend.controller.auth.doc;
 
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
+import com.jong.mikumikureservationbackend.vo.user.request.ChangeNameRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.ChangePasswordRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.EmailVerificationVO;
 import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
@@ -141,6 +142,21 @@ public interface AuthControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조, 탈퇴한 계정")
     })
     ApiResponse<UserVO> getMe();
+
+    @Operation(
+            summary = "닉네임 변경 (예: 내 닉네임을 새 닉네임으로 변경)",
+            description = "요청 본문: name: 새 닉네임 (본문, 필수, 앞뒤 공백을 뺀 1~20자)\n\n"
+                    + "규칙: 닉네임은 다른 사용자와 같아도 된다. 아이디와 이메일은 변경할 수 없다.\n\n"
+                    + "응답: 바뀐 내 정보 (GET /api/auth/me와 같은 모양)")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
+            @ExampleObject(name = "변경 예", value = "{\"name\":\"새닉네임\"}")
+    }))
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "바뀐 내 정보"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류 (공백뿐이거나 20자 초과)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조")
+    })
+    ApiResponse<UserVO> changeName(ChangeNameRequestVO request);
 
     @Operation(
             summary = "비밀번호 변경 (예: 현재 비밀번호 확인 후 새 비밀번호로 변경)",

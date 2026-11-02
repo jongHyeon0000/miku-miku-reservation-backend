@@ -20,8 +20,4 @@ public interface PostCommentImageMapper {
 
     int attach(@Param("userId") Long userId, @Param("postCommentImageId") Long postCommentImageId,
                @Param("postCommentId") Long postCommentId, @Param("sortOrder") int sortOrder);
-
-    List<PostCommentImageVO> selectOrphans(@Param("retentionDays") int retentionDays);
-
-    int deleteOrphanById(@Param("postCommentImageId") Long postCommentImageId);
 }

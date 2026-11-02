@@ -154,6 +154,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
+    public UserVO changeName(Long userId, String name) {
+        String trimmed = name.trim();
+
+        if (trimmed.isEmpty() || trimmed.length() > 20) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "name: 앞뒤 공백을 뺀 1~20자여야 합니다");
+        }
+
+        getMe(userId);
+        userMapper.updateName(userId, trimmed);
+
+        return getMe(userId);
+    }
+
+    @Override
+    @Transactional
     public void changePassword(Long userId, String currentPassword, String newPassword) {
         UserVO user = getMe(userId);
 

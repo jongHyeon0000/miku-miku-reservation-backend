@@ -27,7 +27,7 @@ public class PostCommentImageVO {
     @Schema(description = "소유 계정 id", hidden = true)
     private Long userId;
 
-    /** 댓글 (업로드 직후는 NULL, 댓글 저장 때 채움, NULL로 1일 지나면 고아 정리) */
+    /** 댓글 (업로드 직후는 NULL, 댓글 저장 때 채움) */
     @Schema(description = "댓글 id", hidden = true)
     private Long postCommentId;
 
@@ -47,8 +47,8 @@ public class PostCommentImageVO {
     @Schema(description = "파일 크기(byte) (업로드 결과에만 나온다)", example = "102400")
     private Long fileSize;
 
-    /** 업로드일 (고아 파일 정리 기준) */
-    @Schema(description = "업로드일 (고아 파일 정리 기준)", hidden = true)
+    /** 업로드일 */
+    @Schema(description = "업로드일", hidden = true)
     private LocalDateTime createdAt;
 
     /** [response] 이미지를 내려주는 주소 (/uploads/ + file_path) */

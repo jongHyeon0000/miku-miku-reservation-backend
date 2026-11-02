@@ -19,6 +19,8 @@ public interface UserMapper {
 
     Long selectLastInsertId();
 
+    int updateName(@Param("userId") Long userId, @Param("name") String name);
+
     int updatePassword(@Param("userId") Long userId, @Param("passwordHash") String passwordHash);
 
     int withdraw(@Param("userId") Long userId);

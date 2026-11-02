@@ -1,10 +1,7 @@
 package com.jong.mikumikureservationbackend.mapper.editor;
 
-import com.jong.mikumikureservationbackend.vo.editor.EditorImageVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 @Mapper
 public interface EditorImageMapper {
@@ -13,8 +10,4 @@ public interface EditorImageMapper {
                @Param("originalName") String originalName, @Param("fileSize") Long fileSize);
 
     Long selectLastInsertId();
-
-    List<EditorImageVO> selectOrphans(@Param("retentionDays") int retentionDays);
-
-    int deleteOrphanById(@Param("editorImageId") Long editorImageId);
 }

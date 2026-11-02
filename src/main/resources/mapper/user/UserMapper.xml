@@ -31,6 +31,12 @@
         SELECT LAST_INSERT_ID()
     </select>
 
+    <update id="updateName">
+        UPDATE users
+        SET name = #{name}
+        WHERE user_id = #{userId}
+    </update>
+
     <update id="updatePassword">
         UPDATE users
         SET password_hash = #{passwordHash}

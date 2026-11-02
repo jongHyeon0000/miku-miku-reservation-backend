@@ -39,8 +39,8 @@ public class EditorImageVO {
     @Schema(description = "파일 크기(byte)", example = "102400")
     private Long fileSize;
 
-    /** 업로드일 (고아 파일 정리 기준) */
-    @Schema(description = "업로드일 (고아 파일 정리 기준)", example = "2026-10-12T21:30:00")
+    /** 업로드일 */
+    @Schema(description = "업로드일", example = "2026-10-12T21:30:00")
     private LocalDateTime createdAt;
 
     /** [response] 이미지를 내려주는 주소 (/uploads/ + file_path) */
