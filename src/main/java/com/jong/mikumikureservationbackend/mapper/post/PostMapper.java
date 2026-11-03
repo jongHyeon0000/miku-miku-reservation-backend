@@ -1,5 +1,6 @@
 package com.jong.mikumikureservationbackend.mapper.post;
 
+import com.jong.mikumikureservationbackend.common.constant.PostSearchType;
 import com.jong.mikumikureservationbackend.vo.post.PostVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -10,9 +11,11 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
 
-    List<PostVO> selectPage(@Param("userId") Long userId, @Param("offset") long offset, @Param("size") int size);
+    /* keyword가 null이면 검색 없이 전체 */
+    List<PostVO> selectPage(@Param("userId") Long userId, @Param("searchType") PostSearchType searchType,
+                            @Param("keyword") String keyword, @Param("offset") long offset, @Param("size") int size);
 
-    long countAll();
+    long countAll(@Param("searchType") PostSearchType searchType, @Param("keyword") String keyword);
 
     List<PostVO> selectRecentByUser(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId,
                                     @Param("size") int size);

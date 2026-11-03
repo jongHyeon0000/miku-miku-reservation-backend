@@ -1,6 +1,7 @@
 package com.jong.mikumikureservationbackend.service.post.impl;
 
 import com.jong.mikumikureservationbackend.common.constant.GlobalExceptionCode;
+import com.jong.mikumikureservationbackend.common.constant.PostSearchType;
 import com.jong.mikumikureservationbackend.common.constant.PostStatus;
 import com.jong.mikumikureservationbackend.common.exception.BusinessException;
 import com.jong.mikumikureservationbackend.mapper.post.PostEditorImageMapMapper;
@@ -25,14 +26,24 @@ public class PostServiceImpl implements PostService {
     private final EditorImageService editorImageService;
 
     @Override
-    public PageResponseVO<PostVO> getPage(Long userId, int page, int size) {
+    public PageResponseVO<PostVO> getPage(Long userId, PostSearchType searchType, String keyword, int page, int size) {
         if (page < 1 || size < 1) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "page, size는 1 이상이어야 합니다");
         }
 
         long offset = (long) (page - 1) * size;
-        long totalCount = postMapper.countAll();
-        List<PostVO> items = postMapper.selectPage(userId, offset, size);
+
+        String word = keyword == null ? "" : keyword.trim();
+        PostSearchType type = searchType == null ? PostSearchType.TITLE_CONTENT : searchType;
+
+        // 사용자명은 완전 일치(=)라 이스케이프하면 안 된다
+        if (!word.isEmpty() && type != PostSearchType.AUTHOR) {
+            word = word.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+        }
+
+        String searchWord = word.isEmpty() ? null : word;
+        long totalCount = postMapper.countAll(type, searchWord);
+        List<PostVO> items = postMapper.selectPage(userId, type, searchWord, offset, size);
 
         for (PostVO item : items) {
             if (item.getStatus() != PostStatus.NORMAL) {

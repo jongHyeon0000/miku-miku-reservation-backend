@@ -1,5 +1,6 @@
 package com.jong.mikumikureservationbackend.controller.post;
 
+import com.jong.mikumikureservationbackend.common.constant.PostSearchType;
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.controller.post.doc.PostControllerDocs;
@@ -29,9 +30,11 @@ public class PostController implements PostControllerDocs {
     @Override
     @GetMapping
     public ApiResponse<PageResponseVO<PostVO>> getPage(
+            @RequestParam(required = false) PostSearchType searchType,
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.ok("조회가 완료되었습니다.", postService.getPage(currentUser.getId(), page, size));
+        return ApiResponse.ok("조회가 완료되었습니다.", postService.getPage(currentUser.getId(), searchType, keyword, page, size));
     }
 
     @Override

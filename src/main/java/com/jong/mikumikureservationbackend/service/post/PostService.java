@@ -1,5 +1,6 @@
 package com.jong.mikumikureservationbackend.service.post;
 
+import com.jong.mikumikureservationbackend.common.constant.PostSearchType;
 import com.jong.mikumikureservationbackend.vo.common.PageResponseVO;
 import com.jong.mikumikureservationbackend.vo.post.PostVO;
 
@@ -7,8 +8,8 @@ import java.util.List;
 
 public interface PostService {
 
-    /* 최신순 목록(본문 제외). 삭제, 탈퇴한 글은 내용 없이 자리만 남긴다 */
-    PageResponseVO<PostVO> getPage(Long userId, int page, int size);
+    /* 최신순 목록(본문 제외). 삭제, 탈퇴한 글은 내용 없이 자리만 남긴다. keyword가 있으면 정상 글만 검색한다(searchType이 없으면 제목+내용) */
+    PageResponseVO<PostVO> getPage(Long userId, PostSearchType searchType, String keyword, int page, int size);
 
     /* 그 사용자의 정상 글 최근 size개(최신순, 본문 제외). 없거나 탈퇴한 사용자는 빈 목록 */
     List<PostVO> getRecentByUser(Long userId, Long targetUserId, int size);
