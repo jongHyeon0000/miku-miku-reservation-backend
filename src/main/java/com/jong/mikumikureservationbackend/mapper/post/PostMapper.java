@@ -14,6 +14,9 @@ public interface PostMapper {
 
     long countAll();
 
+    List<PostVO> selectRecentByUser(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId,
+                                    @Param("size") int size);
+
     PostVO selectById(@Param("userId") Long userId, @Param("postId") Long postId);
 
     PostVO selectOwnerAndStatus(@Param("postId") Long postId);

@@ -44,6 +44,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<PostVO> getRecentByUser(Long userId, Long targetUserId, int size) {
+        if (size < 1) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "size는 1 이상이어야 합니다");
+        }
+
+        return postMapper.selectRecentByUser(userId, targetUserId, size);
+    }
+
+    @Override
     @Transactional
     public PostVO getDetail(Long userId, Long postId) {
         PostVO post = postMapper.selectById(userId, postId);

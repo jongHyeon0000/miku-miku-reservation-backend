@@ -12,6 +12,8 @@ public interface PostCommentMapper {
 
     List<PostCommentVO> selectByPost(@Param("userId") Long userId, @Param("postId") Long postId);
 
+    List<PostCommentVO> selectRecentByUser(@Param("targetUserId") Long targetUserId, @Param("size") int size);
+
     PostCommentVO selectById(@Param("userId") Long userId, @Param("postCommentId") Long postCommentId);
 
     PostCommentVO selectBrief(@Param("postCommentId") Long postCommentId);

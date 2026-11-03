@@ -17,6 +17,16 @@
         ORDER BY c.post_comment_id
     </select>
 
+    <!-- 그 사용자의 정상 댓글, 답글 중 달린 글도 정상인 것의 최근 size개(마이페이지, 타인 프로필의 최근 답변). 이동할 글 id와 제목을 함께 준다 -->
+    <select id="selectRecentByUser" resultType="PostCommentVO">
+        SELECT c.post_comment_id, c.post_id, p.title AS post_title, c.content, c.created_at
+        FROM post_comment c
+        JOIN post p ON p.post_id = c.post_id
+        WHERE c.user_id = #{targetUserId} AND c.status = 'NORMAL' AND p.status = 'NORMAL'
+        ORDER BY c.created_at DESC, c.post_comment_id DESC
+        LIMIT #{size}
+    </select>
+
     <select id="selectById" resultType="PostCommentVO">
         SELECT c.post_comment_id, c.parent_post_comment_id, c.user_id, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
                IF(m.status = 'ACTIVE', c.mention_user_id, NULL) AS mention_user_id,

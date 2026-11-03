@@ -62,6 +62,15 @@ public class PostCommentServiceImpl implements PostCommentService {
     }
 
     @Override
+    public List<PostCommentVO> getRecentByUser(Long targetUserId, int size) {
+        if (size < 1) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "size는 1 이상이어야 합니다");
+        }
+
+        return postCommentMapper.selectRecentByUser(targetUserId, size);
+    }
+
+    @Override
     @Transactional
     public PostCommentVO create(Long userId, Long postId, PostCommentVO request) {
         checkPostExists(postId);

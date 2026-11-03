@@ -27,7 +27,7 @@ public class PostCommentVO {
     private Long postCommentId;
 
     /** 게시글 */
-    @Schema(description = "게시글 id", hidden = true)
+    @Schema(description = "게시글 id (내 답변, 사용자 답변 목록에서만 나간다)", example = "12")
     private Long postId;
 
     /** 작성자 */
@@ -62,6 +62,10 @@ public class PostCommentVO {
     /** 수정일 */
     @Schema(description = "수정일시", example = "2026-10-26T11:00:00")
     private LocalDateTime updatedAt;
+
+    /** [post joined] 댓글이 달린 글 제목 (사용자 답변 목록에서만 나간다) */
+    @Schema(description = "댓글이 달린 글 제목 (사용자 답변 목록에서만 나간다)", example = "미쿠 신작 예약 후기")
+    private String postTitle;
 
     /** [users joined] 작성자 이름 */
     @Schema(description = "작성자 이름", example = "미쿠")

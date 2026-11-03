@@ -9,6 +9,9 @@ public interface PostCommentService {
     /* 그 글의 댓글 전체(오래된 순). 최상위 댓글마다 replies에 답글을 담는다. 삭제, 탈퇴한 댓글도 자리에 남고 내용은 가린다. 없거나 삭제, 탈퇴한 글은 404 */
     List<PostCommentVO> getList(Long userId, Long postId);
 
+    /* 그 사용자의 정상 댓글, 답글 중 달린 글도 정상인 것의 최근 size개(최신순). 항목은 내용, 작성일, postId, postTitle. 없거나 탈퇴한 사용자는 빈 목록 */
+    List<PostCommentVO> getRecentByUser(Long targetUserId, int size);
+
     /* 댓글 또는 답글 등록. 이미지는 먼저 업로드해서 받은 id로 연결한다 */
     PostCommentVO create(Long userId, Long postId, PostCommentVO request);
 

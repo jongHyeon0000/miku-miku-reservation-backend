@@ -19,6 +19,19 @@
         FROM post
     </select>
 
+    <!-- 그 사용자의 정상 글 최근 size개(마이페이지, 타인 프로필의 최근 글). userId는 mine 계산용 -->
+    <select id="selectRecentByUser" resultType="PostVO">
+        SELECT p.post_id, p.title, p.view_count, p.status, p.created_at, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
+               (SELECT COUNT(*) FROM post_comment c WHERE c.post_id = p.post_id) AS comment_count,
+               (p.user_id = #{userId}) AS mine
+        FROM post p
+        JOIN users u ON u.user_id = p.user_id
+        LEFT JOIN thumbnail_image t ON t.user_id = u.user_id AND t.target_type = 'USER' AND t.target_id = u.user_id
+        WHERE p.user_id = #{targetUserId} AND p.status = 'NORMAL'
+        ORDER BY p.created_at DESC, p.post_id DESC
+        LIMIT #{size}
+    </select>
+
     <select id="selectById" resultType="PostVO">
         SELECT p.post_id, p.title, p.content, p.view_count, p.status, p.created_at, p.updated_at, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
                (SELECT COUNT(*) FROM post_comment c WHERE c.post_id = p.post_id) AS comment_count,
