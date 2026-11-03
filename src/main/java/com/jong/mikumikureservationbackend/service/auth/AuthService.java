@@ -25,11 +25,8 @@ public interface AuthService {
     /* 이메일 인증을 마친 계정의 비밀번호를 새로 정한다. 인증 완료는 1회용으로 소모된다 */
     void resetPassword(String loginId, String email, String newPassword);
 
-    /* 로그인한 사용자의 닉네임을 바꾸고 바뀐 내 정보를 돌려준다. 앞뒤 공백을 뺀 1~20자이고 중복은 허용한다 */
-    UserVO changeName(Long userId, String name);
-
-    /* 로그인한 사용자의 자기소개를 바꾸고 바뀐 내 정보를 돌려준다. 앞뒤 공백을 뺀 300자 이하이고, 비어 있으면 자기소개를 지운다(NULL) */
-    UserVO changeBiography(Long userId, String biography);
+    /* 로그인한 사용자의 닉네임과 자기소개를 함께 바꾸고 바뀐 내 정보를 돌려준다. 닉네임은 앞뒤 공백을 뺀 1~20자(중복 허용), 자기소개는 앞뒤 공백을 뺀 300자 이하이고 비어 있으면 지운다(NULL) */
+    UserVO changeProfile(Long userId, String name, String biography);
 
     /* 로그인한 사용자의 비밀번호를 바꾼다. 현재 비밀번호가 맞아야 한다 */
     void changePassword(Long userId, String currentPassword, String newPassword);

@@ -49,7 +49,7 @@ public class UserVO {
     private String name;
 
     /** 자기소개 (비어 있을 수 있음, 300자 이하) */
-    @Schema(description = "자기소개 (비어 있을 수 있음, 300자 이하). 가입 때는 받지 않고 PATCH /api/auth/biography로 설정한다", example = "안녕하세요! 미쿠 덕후입니다 💙")
+    @Schema(description = "자기소개 (비어 있을 수 있음, 300자 이하). 가입 때는 받지 않고 PATCH /api/auth/profile로 설정한다", example = "안녕하세요! 미쿠 덕후입니다 💙")
     private String biography;
 
     /** 비밀번호 해시(BCrypt). 응답과 요청 JSON에는 절대 나가거나 들어오지 않는다 */

@@ -2,9 +2,8 @@ package com.jong.mikumikureservationbackend.controller.auth.doc;
 
 import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.vo.user.UserVO;
-import com.jong.mikumikureservationbackend.vo.user.request.ChangeBiographyRequestVO;
-import com.jong.mikumikureservationbackend.vo.user.request.ChangeNameRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.ChangePasswordRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.request.ChangeProfileRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.EmailVerificationVO;
 import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.ResetPasswordRequestVO;
@@ -145,35 +144,20 @@ public interface AuthControllerDocs {
     ApiResponse<UserVO> getMe();
 
     @Operation(
-            summary = "닉네임 변경 (예: 내 닉네임을 새 닉네임으로 변경)",
-            description = "요청 본문: name: 새 닉네임 (본문, 필수, 앞뒤 공백을 뺀 1~20자)\n\n"
-                    + "규칙: 닉네임은 다른 사용자와 같아도 된다. 아이디와 이메일은 변경할 수 없다.\n\n"
+            summary = "프로필 변경 (예: 닉네임과 자기소개를 함께 변경)",
+            description = "요청 본문: name: 새 닉네임 (본문, 필수, 앞뒤 공백을 뺀 1~20자), biography: 새 자기소개 (본문, 선택, 앞뒤 공백을 뺀 300자 이하, 이모지도 1자로 센다)\n\n"
+                    + "규칙: 보낸 값으로 통째로 교체한다. 자기소개를 비우려면 빈 문자열, null, 공백만 보내거나 필드를 빼면 되고 응답에서 biography 필드가 빠진다. 닉네임은 다른 사용자와 같아도 된다. 아이디와 이메일은 변경할 수 없다. 가입 때는 자기소개를 받지 않고 항상 비어 있게 시작한다.\n\n"
                     + "응답: 바뀐 내 정보 (GET /api/auth/me와 같은 모양)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "변경 예", value = "{\"name\":\"새닉네임\"}")
+            @ExampleObject(name = "변경 예", value = "{\"name\":\"새닉네임\",\"biography\":\"안녕하세요! 미쿠 덕후입니다 💙\"}"),
+            @ExampleObject(name = "자기소개 지우기 예", value = "{\"name\":\"새닉네임\",\"biography\":\"\"}")
     }))
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "바뀐 내 정보"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류 (공백뿐이거나 20자 초과)"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류 (닉네임이 비었거나 21자 이상, 자기소개 301자 이상)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조")
     })
-    ApiResponse<UserVO> changeName(ChangeNameRequestVO request);
-
-    @Operation(
-            summary = "자기소개 변경 (예: 내 자기소개를 새 글로 변경하거나 지우기)",
-            description = "요청 본문: biography: 새 자기소개 (본문, 선택, 앞뒤 공백을 뺀 300자 이하, 이모지와 특수문자 포함 가능)\n\n"
-                    + "규칙: 비어 있어도 된다. 빈 문자열이나 null, 공백만 보내면 자기소개를 지운다(응답에서 biography 필드가 빠진다). 가입 때는 받지 않고 항상 비어 있게 시작한다.\n\n"
-                    + "응답: 바뀐 내 정보 (GET /api/auth/me와 같은 모양)")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {
-            @ExampleObject(name = "변경 예", value = "{\"biography\":\"안녕하세요! 미쿠 덕후입니다 💙\"}"),
-            @ExampleObject(name = "지우기 예", value = "{\"biography\":\"\"}")
-    }))
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "바뀐 내 정보"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 오류 (301자 이상)"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "토큰 없음, 만료, 변조")
-    })
-    ApiResponse<UserVO> changeBiography(ChangeBiographyRequestVO request);
+    ApiResponse<UserVO> changeProfile(ChangeProfileRequestVO request);
 
     @Operation(
             summary = "비밀번호 변경 (예: 현재 비밀번호 확인 후 새 비밀번호로 변경)",

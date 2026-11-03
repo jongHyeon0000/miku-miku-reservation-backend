@@ -154,31 +154,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public UserVO changeName(Long userId, String name) {
-        String trimmed = name.trim();
+    public UserVO changeProfile(Long userId, String name, String biography) {
+        String trimmedName = name.trim();
 
-        if (trimmed.isEmpty() || trimmed.length() > 20) {
+        if (trimmedName.isEmpty() || trimmedName.length() > 20) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "name: 앞뒤 공백을 뺀 1~20자여야 합니다");
         }
 
-        getMe(userId);
-        userMapper.updateName(userId, trimmed);
+        /* 자기소개는 이모지를 1자로 세려고 codePointCount를 쓴다(@Size와 length()는 이모지를 2자로 센다). DB VARCHAR(300)도 글자 단위다 */
+        String trimmedBiography = biography == null ? "" : biography.trim();
 
-        return getMe(userId);
-    }
-
-    @Override
-    @Transactional
-    public UserVO changeBiography(Long userId, String biography) {
-        /* 이모지를 1자로 세려고 codePointCount를 쓴다(@Size와 length()는 이모지를 2자로 센다). DB VARCHAR(300)도 글자 단위다 */
-        String trimmed = biography == null ? "" : biography.trim();
-
-        if (trimmed.codePointCount(0, trimmed.length()) > 300) {
+        if (trimmedBiography.codePointCount(0, trimmedBiography.length()) > 300) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "biography: 앞뒤 공백을 뺀 300자 이하여야 합니다");
         }
 
         getMe(userId);
-        userMapper.updateBiography(userId, trimmed.isEmpty() ? null : trimmed);
+        userMapper.updateProfile(userId, trimmedName, trimmedBiography.isEmpty() ? null : trimmedBiography);
 
         return getMe(userId);
     }

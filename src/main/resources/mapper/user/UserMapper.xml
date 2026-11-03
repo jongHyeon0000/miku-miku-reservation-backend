@@ -31,15 +31,9 @@
         SELECT LAST_INSERT_ID()
     </select>
 
-    <update id="updateName">
+    <update id="updateProfile">
         UPDATE users
-        SET name = #{name}
-        WHERE user_id = #{userId}
-    </update>
-
-    <update id="updateBiography">
-        UPDATE users
-        SET biography = #{biography,jdbcType=VARCHAR}
+        SET name = #{name}, biography = #{biography,jdbcType=VARCHAR}
         WHERE user_id = #{userId}
     </update>
 

@@ -4,9 +4,8 @@ import com.jong.mikumikureservationbackend.common.response.ApiResponse;
 import com.jong.mikumikureservationbackend.common.security.CurrentUser;
 import com.jong.mikumikureservationbackend.controller.auth.doc.AuthControllerDocs;
 import com.jong.mikumikureservationbackend.service.auth.AuthService;
-import com.jong.mikumikureservationbackend.vo.user.request.ChangeBiographyRequestVO;
-import com.jong.mikumikureservationbackend.vo.user.request.ChangeNameRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.ChangePasswordRequestVO;
+import com.jong.mikumikureservationbackend.vo.user.request.ChangeProfileRequestVO;
 import com.jong.mikumikureservationbackend.vo.user.request.EmailVerificationVO;
 import com.jong.mikumikureservationbackend.vo.user.response.FindIdResponseVO;
 import com.jong.mikumikureservationbackend.vo.user.request.LoginRequestVO;
@@ -89,15 +88,9 @@ public class AuthController implements AuthControllerDocs {
     }
 
     @Override
-    @PatchMapping("/name")
-    public ApiResponse<UserVO> changeName(@Valid @RequestBody ChangeNameRequestVO request) {
-        return ApiResponse.ok("수정이 완료되었습니다.", authService.changeName(currentUser.getId(), request.getName()));
-    }
-
-    @Override
-    @PatchMapping("/biography")
-    public ApiResponse<UserVO> changeBiography(@Valid @RequestBody ChangeBiographyRequestVO request) {
-        return ApiResponse.ok("수정이 완료되었습니다.", authService.changeBiography(currentUser.getId(), request.getBiography()));
+    @PatchMapping("/profile")
+    public ApiResponse<UserVO> changeProfile(@Valid @RequestBody ChangeProfileRequestVO request) {
+        return ApiResponse.ok("수정이 완료되었습니다.", authService.changeProfile(currentUser.getId(), request.getName(), request.getBiography()));
     }
 
     @Override

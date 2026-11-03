@@ -19,9 +19,7 @@ public interface UserMapper {
 
     Long selectLastInsertId();
 
-    int updateName(@Param("userId") Long userId, @Param("name") String name);
-
-    int updateBiography(@Param("userId") Long userId, @Param("biography") String biography);
+    int updateProfile(@Param("userId") Long userId, @Param("name") String name, @Param("biography") String biography);
 
     int updatePassword(@Param("userId") Long userId, @Param("passwordHash") String passwordHash);
 
