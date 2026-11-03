@@ -1,7 +1,6 @@
 package com.jong.mikumikureservationbackend.vo.user.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +17,5 @@ public class ChangeBiographyRequestVO {
 
     /** [request] 새 자기소개 (300자 이하, 비어 있어도 된다) */
     @Schema(description = "새 자기소개 (앞뒤 공백을 뺀 300자 이하, 비어 있으면 자기소개를 지운다)", example = "안녕하세요! 미쿠 덕후입니다 💙", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Size(max = 300)
     private String biography;
 }

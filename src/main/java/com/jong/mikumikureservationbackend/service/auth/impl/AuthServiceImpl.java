@@ -170,9 +170,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public UserVO changeBiography(Long userId, String biography) {
+        /* 이모지를 1자로 세려고 codePointCount를 쓴다(@Size와 length()는 이모지를 2자로 센다). DB VARCHAR(300)도 글자 단위다 */
         String trimmed = biography == null ? "" : biography.trim();
 
-        if (trimmed.length() > 300) {
+        if (trimmed.codePointCount(0, trimmed.length()) > 300) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "biography: 앞뒤 공백을 뺀 300자 이하여야 합니다");
         }
 
