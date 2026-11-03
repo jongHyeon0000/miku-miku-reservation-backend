@@ -169,6 +169,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
+    public UserVO changeBiography(Long userId, String biography) {
+        String trimmed = biography == null ? "" : biography.trim();
+
+        if (trimmed.length() > 300) {
+            throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "biography: 앞뒤 공백을 뺀 300자 이하여야 합니다");
+        }
+
+        getMe(userId);
+        userMapper.updateBiography(userId, trimmed.isEmpty() ? null : trimmed);
+
+        return getMe(userId);
+    }
+
+    @Override
+    @Transactional
     public void changePassword(Long userId, String currentPassword, String newPassword) {
         UserVO user = getMe(userId);
 

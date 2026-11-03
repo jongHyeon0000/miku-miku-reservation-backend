@@ -15,7 +15,7 @@
     </select>
 
     <select id="selectById" resultType="UserVO">
-        SELECT u.user_id, u.login_id, u.email, u.name, u.created_at, u.updated_at,
+        SELECT u.user_id, u.login_id, u.email, u.name, u.biography, u.created_at, u.updated_at,
                CONCAT('/uploads/', t.file_path) AS thumbnail_url
         FROM users u
         LEFT JOIN thumbnail_image t ON t.user_id = u.user_id AND t.target_type = 'USER' AND t.target_id = u.user_id
@@ -34,6 +34,12 @@
     <update id="updateName">
         UPDATE users
         SET name = #{name}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateBiography">
+        UPDATE users
+        SET biography = #{biography,jdbcType=VARCHAR}
         WHERE user_id = #{userId}
     </update>
 
