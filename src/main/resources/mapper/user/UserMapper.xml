@@ -25,6 +25,18 @@
         WHERE u.user_id = #{userId} AND u.status = 'ACTIVE'
     </select>
 
+    <!-- 타인 프로필용. 아이디, 이메일은 남에게 보이면 안 되므로 조회하지 않는다 -->
+    <select id="selectProfileById" resultType="UserVO">
+        SELECT u.user_id, u.name, u.biography, u.created_at,
+               (SELECT COUNT(*) FROM post p WHERE p.user_id = u.user_id AND p.status = 'NORMAL') AS post_count,
+               (SELECT COUNT(*) FROM post_comment c JOIN post cp ON cp.post_id = c.post_id
+                WHERE c.user_id = u.user_id AND c.status = 'NORMAL' AND cp.status = 'NORMAL') AS comment_count,
+               CONCAT('/uploads/', t.file_path) AS thumbnail_url
+        FROM users u
+        LEFT JOIN thumbnail_image t ON t.user_id = u.user_id AND t.target_type = 'USER' AND t.target_id = u.user_id
+        WHERE u.user_id = #{userId} AND u.status = 'ACTIVE'
+    </select>
+
     <insert id="insert">
         INSERT INTO users (login_id, email, name, password_hash)
         VALUES (#{loginId}, #{email}, #{name}, #{passwordHash})

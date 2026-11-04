@@ -133,6 +133,7 @@ public class PostServiceImpl implements PostService {
 
     /* 삭제, 탈퇴한 글은 응답에 내용이 나가지 않게 postId, status, createdAt만 남긴다 */
     private void hideContent(PostVO post) {
+        post.setUserId(null);
         post.setTitle(null);
         post.setAuthorName(null);
         post.setAuthorThumbnailUrl(null);

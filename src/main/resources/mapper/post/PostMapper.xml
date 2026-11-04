@@ -32,7 +32,7 @@
 
     <!-- 삭제, 탈퇴한 글도 목록에 자리를 남긴다(내용 가림은 서비스가 한다). 본문은 목록에서 뺀다 -->
     <select id="selectPage" resultType="PostVO">
-        SELECT p.post_id, p.title, p.view_count, p.status, p.created_at, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
+        SELECT p.post_id, p.user_id, p.title, p.view_count, p.status, p.created_at, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
                (SELECT COUNT(*) FROM post_comment c WHERE c.post_id = p.post_id) AS comment_count,
                (p.user_id = #{userId}) AS mine
         FROM post p
@@ -64,7 +64,7 @@
     </select>
 
     <select id="selectById" resultType="PostVO">
-        SELECT p.post_id, p.title, p.content, p.view_count, p.status, p.created_at, p.updated_at, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
+        SELECT p.post_id, p.user_id, p.title, p.content, p.view_count, p.status, p.created_at, p.updated_at, u.name AS author_name, CONCAT('/uploads/', t.file_path) AS author_thumbnail_url,
                (SELECT COUNT(*) FROM post_comment c WHERE c.post_id = p.post_id) AS comment_count,
                (p.user_id = #{userId}) AS mine
         FROM post p

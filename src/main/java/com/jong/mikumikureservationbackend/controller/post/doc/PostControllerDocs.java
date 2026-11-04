@@ -20,8 +20,8 @@ public interface PostControllerDocs {
             description = "쿼리: authorId: 그 사용자의 정상 글만 (user id 완전 일치, 프로필의 글 더보기용, 검색어와 함께 쓰면 둘 다 적용), searchType: 검색 대상 (TITLE_CONTENT 제목+내용, TITLE 제목, CONTENT 내용, AUTHOR 사용자명, 없으면 TITLE_CONTENT), keyword: 검색어 (앞뒤 공백을 뺀다, 없거나 비면 검색 없이 전체 목록), "
                     + "page: 페이지 번호 (1부터, 기본 1), size: 한 페이지 개수 (기본 10)\n\n"
                     + "검색: keyword나 authorId가 있으면 정상(NORMAL) 글만 대상이다. 제목, 내용은 부분 일치(내용은 저장된 HTML 원문 기준)이고 사용자명은 완전 일치(이름 중복 허용이라 같은 이름의 다른 사용자 글도 나온다). totalCount, totalPages는 검색 결과 기준이다\n\n"
-                    + "응답: items(postId, title, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, status, mine), page, size, totalCount, totalPages. 최신순이고 본문은 없다. "
-                    + "삭제(DELETED), 탈퇴(WITHDRAWN)한 글은 자리에 남지만 postId, status, createdAt만 나온다")
+                    + "응답: items(postId, userId(작성자 id, 프로필 조회 GET /api/user/{userId}에 쓴다), title, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, status, mine), page, size, totalCount, totalPages. 최신순이고 본문은 없다. "
+                    + "삭제(DELETED), 탈퇴(WITHDRAWN)한 글은 자리에 남지만 postId, status, createdAt만 나온다(userId도 나오지 않는다)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "items, page, size, totalCount, totalPages"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "page 또는 size가 1 미만, searchType이 허용 값이 아님")
@@ -36,9 +36,9 @@ public interface PostControllerDocs {
     @Operation(
             summary = "게시글 상세 조회 (예: 글 열기, 조회수 +1)",
             description = "호출할 때마다 조회수가 1 오르고 응답의 viewCount는 오른 뒤 값이다.\n\n"
-                    + "응답: postId, title, content(에디터 HTML), authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, updatedAt, status, mine")
+                    + "응답: postId, userId(작성자 id), title, content(에디터 HTML), authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, updatedAt, status, mine")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "postId, title, content, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, updatedAt, status, mine"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "postId, userId, title, content, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, updatedAt, status, mine"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "없는 글, 삭제 또는 탈퇴한 글")
     })
     ApiResponse<PostVO> getDetail(

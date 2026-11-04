@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 
 /**
  * 계정 (테이블 users)
- * 가입 요청(loginId, email, name, password만 읽음), 내 정보 응답, 매퍼 조회 결과에 같이 쓴다. [request] 표시가 붙은 필드는 컬럼이 아니다.
+ * 가입 요청(loginId, email, name, password만 읽음), 내 정보 응답, 타인 프로필 응답(loginId, email 제외), 매퍼 조회 결과에 같이 쓴다. [request] 표시가 붙은 필드는 컬럼이 아니다.
  */
-@Schema(description = "계정. 가입 요청(loginId, email, name, password만 읽음)과 내 정보 응답에 같이 쓴다")
+@Schema(description = "계정. 가입 요청(loginId, email, name, password만 읽음), 내 정보 응답, 타인 프로필 응답(loginId, email 제외)에 같이 쓴다")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -52,12 +52,12 @@ public class UserVO {
     @Schema(description = "자기소개 (비어 있을 수 있음, 300자 이하). 가입 때는 받지 않고 PATCH /api/auth/profile로 설정한다", example = "안녕하세요! 미쿠 덕후입니다 💙")
     private String biography;
 
-    /** [post joined] 내가 쓴 정상 글 수 (삭제, 탈퇴한 글 제외, 내 정보 조회에서만 나간다) */
-    @Schema(description = "내가 쓴 글 수 (정상 상태만, GET /api/auth/me 응답에서만 나간다)", example = "12", accessMode = Schema.AccessMode.READ_ONLY)
+    /** [post joined] 정상 글 수 (삭제, 탈퇴한 글 제외, 내 정보 조회와 타인 프로필 조회에서만 나간다) */
+    @Schema(description = "쓴 글 수 (정상 상태만, GET /api/auth/me, GET /api/user/{userId} 응답에서만 나간다)", example = "12", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer postCount;
 
-    /** [post_comment joined] 내가 쓴 정상 댓글, 답글 수 (삭제, 탈퇴한 것과 삭제, 탈퇴한 글에 단 것 제외, 내 정보 조회에서만 나간다) */
-    @Schema(description = "내가 쓴 답변(댓글, 답글) 수 (정상 상태이고 달린 글도 정상인 것만, GET /api/auth/me 응답에서만 나간다)", example = "34", accessMode = Schema.AccessMode.READ_ONLY)
+    /** [post_comment joined] 정상 댓글, 답글 수 (삭제, 탈퇴한 것과 삭제, 탈퇴한 글에 단 것 제외, 내 정보 조회와 타인 프로필 조회에서만 나간다) */
+    @Schema(description = "쓴 답변(댓글, 답글) 수 (정상 상태이고 달린 글도 정상인 것만, GET /api/auth/me, GET /api/user/{userId} 응답에서만 나간다)", example = "34", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer commentCount;
 
     /** 비밀번호 해시(BCrypt). 응답과 요청 JSON에는 절대 나가거나 들어오지 않는다 */

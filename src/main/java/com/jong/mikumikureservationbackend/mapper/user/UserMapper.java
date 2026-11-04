@@ -14,6 +14,8 @@ public interface UserMapper {
 
     UserVO selectById(@Param("userId") Long userId);
 
+    UserVO selectProfileById(@Param("userId") Long userId);
+
     int insert(@Param("loginId") String loginId, @Param("email") String email,
                @Param("name") String name, @Param("passwordHash") String passwordHash);
 

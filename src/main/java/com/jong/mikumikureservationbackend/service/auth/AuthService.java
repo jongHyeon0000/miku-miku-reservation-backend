@@ -35,6 +35,9 @@ public interface AuthService {
 
     UserVO getMe(Long userId);
 
+    /* 타인 프로필(아이디, 이메일 제외). 없거나 탈퇴한 사용자는 404 */
+    UserVO getProfile(Long targetUserId);
+
     /* 업로드 파일은 DB 삭제가 커밋된 뒤에 지운다 */
     void withdraw(Long userId, String password);
 }

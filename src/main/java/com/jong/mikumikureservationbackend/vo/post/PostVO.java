@@ -27,7 +27,7 @@ public class PostVO {
     private Long postId;
 
     /** 작성자 */
-    @Schema(description = "작성자 계정 id. 요청 본문에 보내도 읽지 않는다", example = "1")
+    @Schema(description = "작성자 계정 id (프로필 조회에 쓴다, 삭제, 탈퇴한 글은 생략). 요청 본문에 보내도 읽지 않는다", example = "1")
     private Long userId;
 
     /** 제목 */

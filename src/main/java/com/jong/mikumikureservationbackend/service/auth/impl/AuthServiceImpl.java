@@ -217,6 +217,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public UserVO getProfile(Long targetUserId) {
+        UserVO user = userMapper.selectProfileById(targetUserId);
+
+        if (user == null) {
+            throw new BusinessException(GlobalExceptionCode.NOT_FOUND);
+        }
+
+        return user;
+    }
+
+    @Override
     @Transactional
     public void withdraw(Long userId, String password) {
         UserVO user = getMe(userId);
