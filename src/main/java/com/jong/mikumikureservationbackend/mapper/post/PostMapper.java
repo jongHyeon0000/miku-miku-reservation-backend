@@ -11,11 +11,11 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
 
-    /* keyword가 null이면 검색 없이 전체 */
-    List<PostVO> selectPage(@Param("userId") Long userId, @Param("searchType") PostSearchType searchType,
+    /* keyword, authorId가 모두 null이면 검색 없이 전체 */
+    List<PostVO> selectPage(@Param("userId") Long userId, @Param("authorId") Long authorId, @Param("searchType") PostSearchType searchType,
                             @Param("keyword") String keyword, @Param("offset") long offset, @Param("size") int size);
 
-    long countAll(@Param("searchType") PostSearchType searchType, @Param("keyword") String keyword);
+    long countAll(@Param("authorId") Long authorId, @Param("searchType") PostSearchType searchType, @Param("keyword") String keyword);
 
     List<PostVO> selectRecentByUser(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId,
                                     @Param("size") int size);

@@ -26,7 +26,7 @@ public class PostServiceImpl implements PostService {
     private final EditorImageService editorImageService;
 
     @Override
-    public PageResponseVO<PostVO> getPage(Long userId, PostSearchType searchType, String keyword, int page, int size) {
+    public PageResponseVO<PostVO> getPage(Long userId, Long authorId, PostSearchType searchType, String keyword, int page, int size) {
         if (page < 1 || size < 1) {
             throw new BusinessException(GlobalExceptionCode.VALIDATION_FAILED, "page, size는 1 이상이어야 합니다");
         }
@@ -42,8 +42,8 @@ public class PostServiceImpl implements PostService {
         }
 
         String searchWord = word.isEmpty() ? null : word;
-        long totalCount = postMapper.countAll(type, searchWord);
-        List<PostVO> items = postMapper.selectPage(userId, type, searchWord, offset, size);
+        long totalCount = postMapper.countAll(authorId, type, searchWord);
+        List<PostVO> items = postMapper.selectPage(userId, authorId, type, searchWord, offset, size);
 
         for (PostVO item : items) {
             if (item.getStatus() != PostStatus.NORMAL) {

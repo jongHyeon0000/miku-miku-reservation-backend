@@ -2,25 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jong.mikumikureservationbackend.mapper.post.PostMapper">
 
-    <!-- 검색어가 있으면 정상 글만 대상이다(삭제, 탈퇴한 글은 제목과 내용을 가리므로). LIKE의 와일드카드 이스케이프는 서비스가 한다 -->
+    <!-- 검색어나 authorId가 있으면 정상 글만 대상이다(삭제, 탈퇴한 글은 제목과 내용을 가리므로). LIKE의 와일드카드 이스케이프는 서비스가 한다 -->
     <sql id="searchWhere">
-        <if test="keyword != null">
-            WHERE p.status = 'NORMAL'
-            <choose>
-                <when test="searchType.name() == 'TITLE'">
-                    AND p.title LIKE CONCAT('%', #{keyword}, '%')
-                </when>
-                <when test="searchType.name() == 'CONTENT'">
-                    AND p.content LIKE CONCAT('%', #{keyword}, '%')
-                </when>
-                <when test="searchType.name() == 'AUTHOR'">
-                    AND u.name = #{keyword}
-                </when>
-                <otherwise>
-                    AND (p.title LIKE CONCAT('%', #{keyword}, '%') OR p.content LIKE CONCAT('%', #{keyword}, '%'))
-                </otherwise>
-            </choose>
-        </if>
+        <where>
+            <if test="keyword != null or authorId != null">
+                p.status = 'NORMAL'
+            </if>
+            <if test="authorId != null">
+                AND p.user_id = #{authorId}
+            </if>
+            <if test="keyword != null">
+                <choose>
+                    <when test="searchType.name() == 'TITLE'">
+                        AND p.title LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType.name() == 'CONTENT'">
+                        AND p.content LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType.name() == 'AUTHOR'">
+                        AND u.name = #{keyword}
+                    </when>
+                    <otherwise>
+                        AND (p.title LIKE CONCAT('%', #{keyword}, '%') OR p.content LIKE CONCAT('%', #{keyword}, '%'))
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
     </sql>
 
     <!-- 삭제, 탈퇴한 글도 목록에 자리를 남긴다(내용 가림은 서비스가 한다). 본문은 목록에서 뺀다 -->

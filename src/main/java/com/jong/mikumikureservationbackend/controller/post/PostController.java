@@ -30,11 +30,12 @@ public class PostController implements PostControllerDocs {
     @Override
     @GetMapping
     public ApiResponse<PageResponseVO<PostVO>> getPage(
+            @RequestParam(required = false) Long authorId,
             @RequestParam(required = false) PostSearchType searchType,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.ok("조회가 완료되었습니다.", postService.getPage(currentUser.getId(), searchType, keyword, page, size));
+        return ApiResponse.ok("조회가 완료되었습니다.", postService.getPage(currentUser.getId(), authorId, searchType, keyword, page, size));
     }
 
     @Override

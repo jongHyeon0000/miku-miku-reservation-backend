@@ -17,9 +17,9 @@ public interface PostControllerDocs {
 
     @Operation(
             summary = "게시글 목록 조회와 검색 (예: 최신 글 10개, 제목에 미쿠가 들어간 글)",
-            description = "쿼리: searchType: 검색 대상 (TITLE_CONTENT 제목+내용, TITLE 제목, CONTENT 내용, AUTHOR 사용자명, 없으면 TITLE_CONTENT), keyword: 검색어 (앞뒤 공백을 뺀다, 없거나 비면 검색 없이 전체 목록), "
+            description = "쿼리: authorId: 그 사용자의 정상 글만 (user id 완전 일치, 프로필의 글 더보기용, 검색어와 함께 쓰면 둘 다 적용), searchType: 검색 대상 (TITLE_CONTENT 제목+내용, TITLE 제목, CONTENT 내용, AUTHOR 사용자명, 없으면 TITLE_CONTENT), keyword: 검색어 (앞뒤 공백을 뺀다, 없거나 비면 검색 없이 전체 목록), "
                     + "page: 페이지 번호 (1부터, 기본 1), size: 한 페이지 개수 (기본 10)\n\n"
-                    + "검색: keyword가 있으면 정상(NORMAL) 글만 대상이다. 제목, 내용은 부분 일치(내용은 저장된 HTML 원문 기준)이고 사용자명은 완전 일치(이름 중복 허용이라 같은 이름의 다른 사용자 글도 나온다). totalCount, totalPages는 검색 결과 기준이다\n\n"
+                    + "검색: keyword나 authorId가 있으면 정상(NORMAL) 글만 대상이다. 제목, 내용은 부분 일치(내용은 저장된 HTML 원문 기준)이고 사용자명은 완전 일치(이름 중복 허용이라 같은 이름의 다른 사용자 글도 나온다). totalCount, totalPages는 검색 결과 기준이다\n\n"
                     + "응답: items(postId, title, authorName, authorThumbnailUrl(없으면 생략), viewCount, commentCount, createdAt, status, mine), page, size, totalCount, totalPages. 최신순이고 본문은 없다. "
                     + "삭제(DELETED), 탈퇴(WITHDRAWN)한 글은 자리에 남지만 postId, status, createdAt만 나온다")
     @ApiResponses({
@@ -27,6 +27,7 @@ public interface PostControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "page 또는 size가 1 미만, searchType이 허용 값이 아님")
     })
     ApiResponse<PageResponseVO<PostVO>> getPage(
+            @Parameter(description = "작성자 user id (그 사용자의 정상 글만)", example = "1") Long authorId,
             @Parameter(description = "검색 대상 (TITLE_CONTENT, TITLE, CONTENT, AUTHOR)", example = "TITLE") PostSearchType searchType,
             @Parameter(description = "검색어", example = "미쿠") String keyword,
             @Parameter(description = "페이지 번호 (1부터)", example = "1") int page,
